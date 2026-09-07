@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fisiotrilha · OITFC v3 — Sharp Consulting Group</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#030B18;--bg2:#061220;--bg3:#091929;--panel:#0C1F38;--panel2:#102540;--panel3:#142C4A;
+  --b1:#1565D8;--b2:#1E78F0;--b3:#3A92FF;--bglow:rgba(21,101,216,.35);--bfade:rgba(21,101,216,.1);--bborder:rgba(21,101,216,.28);
+  --cyan:#00D4FF;--cyanf:rgba(0,212,255,.12);--cyanb:rgba(0,212,255,.28);
+  --green:#00C97A;--greenf:rgba(0,201,122,.13);--greenb:rgba(0,201,122,.28);
+  --amber:#F5A623;--ambf:rgba(245,166,35,.12);--ambb:rgba(245,166,35,.28);
+  --red:#FF3B5C;--redf:rgba(255,59,92,.12);--redb:rgba(255,59,92,.3);
+  --t1:rgba(255,255,255,.92);--t2:rgba(255,255,255,.6);--t3:rgba(255,255,255,.3);--t4:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
+  --font:'Plus Jakarta Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:9px;--rl:13px;--rxl:18px;--rpill:100px;
+  --cs:0 2px 24px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.04) inset;
+  --gblue:0 0 28px rgba(21,101,216,.28);--gcyan:0 0 20px rgba(0,212,255,.22);--gred:0 0 32px rgba(255,59,92,.5);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--panel3);border-radius:2px}
+
+/* LOADER */
+#loader{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s}
+#loader.out{opacity:0;pointer-events:none}
+.load-logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#0A47B8,var(--b2));display:flex;align-items:center;justify-content:center;box-shadow:var(--gblue);margin-bottom:1.5rem;animation:loadPop .6s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes loadPop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+.load-brand{font-size:1.8rem;font-weight:800;letter-spacing:-.4px;animation:fadeUp .5s .2s both}
+.load-brand em{color:var(--b3);font-style:normal}
+.load-slogan{font-size:.7rem;color:var(--t3);text-transform:uppercase;letter-spacing:.12em;margin-top:4px;animation:fadeUp .5s .3s both}
+.load-bar-wrap{width:280px;height:3px;background:var(--panel2);border-radius:2px;margin-top:2rem;overflow:hidden;animation:fadeUp .5s .4s both}
+.load-bar{height:100%;background:linear-gradient(90deg,var(--b1),var(--cyan));border-radius:2px;width:0%;transition:width .15s linear}
+.load-status{font-size:.62rem;font-family:var(--mono);color:var(--t3);margin-top:.6rem;animation:fadeUp .5s .5s both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* LOGIN */
+#screen-login{min-height:100vh;display:none;grid-template-columns:1fr 1fr}
+@media(max-width:860px){#screen-login{grid-template-columns:1fr}.login-visual{display:none!important}}
+.login-visual{background:linear-gradient(145deg,var(--bg2),var(--panel));display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 2rem;border-right:1px solid var(--border);position:relative;overflow:hidden}
+.login-visual::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 30%,rgba(21,101,216,.12),transparent),repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(21,101,216,.03) 60px),repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(21,101,216,.03) 60px);pointer-events:none}
+.lv-title{font-size:1.9rem;font-weight:800;letter-spacing:-.5px;text-align:center;line-height:1.2;margin-top:1.5rem;position:relative;z-index:1}
+.lv-title span{color:var(--b3)}
+.lv-sub{font-size:.65rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:.5rem;text-align:center;position:relative;z-index:1}
+.lv-feats{display:flex;flex-direction:column;gap:8px;margin-top:1.5rem;position:relative;z-index:1}
+.lv-feat{display:flex;align-items:center;gap:8px;font-size:.7rem;color:var(--t2)}
+.lv-feat-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);flex-shrink:0}
+.login-form-side{background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 2rem}
+.lc{width:100%;max-width:400px;animation:fadeUp .5s .15s both}
+.lc-brand{display:flex;align-items:center;gap:12px;margin-bottom:2rem}
+.lc-mark{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#0A47B8,var(--b2));display:flex;align-items:center;justify-content:center;box-shadow:var(--gblue);flex-shrink:0}
+.lc-name{font-size:1.3rem;font-weight:800;letter-spacing:-.3px}
+.lc-name em{color:var(--b3);font-style:normal}
+.lc-tag{font-size:.6rem;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+.lc-h{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
+.fld{margin-bottom:.8rem}
+.fld label{display:block;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:5px}
+.fld input{width:100%;padding:.62rem .82rem;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);font-family:var(--font);font-size:.875rem;color:var(--t1);outline:none;transition:border-color .18s,box-shadow .18s}
+.fld input:focus{border-color:var(--b2);box-shadow:0 0 0 3px rgba(21,101,216,.18)}
+.fld input::placeholder{color:var(--t3)}
+.fld.mono input{font-family:var(--mono);font-size:.75rem;letter-spacing:.05em;color:var(--cyan)}
+.lgpd-note{display:flex;gap:8px;padding:.62rem .75rem;background:rgba(21,101,216,.08);border:1px solid var(--bborder);border-radius:8px;font-size:.65rem;color:var(--t2);line-height:1.55;margin:.9rem 0}
+.lgpd-note strong{color:var(--b3)}
+.btn-enter{width:100%;padding:.72rem;background:var(--b1);color:#fff;border:none;border-radius:var(--r);font-family:var(--font);font-size:.9rem;font-weight:700;cursor:pointer;transition:background .15s,box-shadow .15s,transform .1s;letter-spacing:.02em}
+.btn-enter:hover{background:var(--b2);box-shadow:var(--gblue)}.btn-enter:active{transform:scale(.99)}
+.lc-footer{text-align:center;font-size:.58rem;color:var(--t3);margin-top:.8rem}
+
+/* APP SHELL */
+#screen-app{display:none;flex-direction:column;min-height:100vh}
+.audit-bar{background:var(--bg);border-bottom:1px solid var(--border);padding:4px 1.5rem;display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;font-family:var(--mono);font-size:.58rem;color:var(--t3)}
+.ab-chip{display:flex;align-items:center;gap:5px;color:var(--t2)}
+.ab-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.topbar{height:58px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 1.5rem;gap:1rem;position:sticky;top:0;z-index:300;box-shadow:0 2px 20px rgba(0,0,0,.4)}
+.tb-brand{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.tb-mark{width:33px;height:33px;border-radius:9px;background:linear-gradient(135deg,#0A47B8,var(--b2));display:flex;align-items:center;justify-content:center;box-shadow:var(--gblue)}
+.tb-name{font-size:.95rem;font-weight:800;letter-spacing:-.2px}
+.tb-name em{color:var(--b3);font-style:normal}
+.tb-sep{width:1px;height:22px;background:var(--border)}.tb-ver{font-size:.58rem;font-family:var(--mono);color:var(--t3)}.tb-spacer{flex:1}
+.tb-tabs{display:flex;gap:3px;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:4px}
+.ttab{padding:5px 13px;border-radius:8px;font-family:var(--font);font-size:.7rem;font-weight:600;cursor:pointer;border:none;background:none;color:var(--t3);transition:all .15s;white-space:nowrap}
+.ttab.active{background:var(--b1);color:#fff;box-shadow:0 2px 10px rgba(21,101,216,.4)}
+.ttab:hover:not(.active){color:var(--t1);background:var(--panel2)}
+.tb-right{display:flex;align-items:center;gap:8px}
+.live-pill{display:flex;align-items:center;gap:5px;padding:4px 10px;background:var(--greenf);border:1px solid var(--greenb);border-radius:var(--rpill);font-size:.58rem;font-weight:700;color:var(--green);letter-spacing:.08em}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.5s infinite}
+.user-pill{display:flex;align-items:center;gap:7px;padding:4px 10px 4px 5px;background:var(--panel2);border:1px solid var(--border);border-radius:var(--rpill);font-size:.68rem;font-weight:500;color:var(--t2)}
+.user-av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#0A47B8,var(--b2));display:flex;align-items:center;justify-content:center;font-size:.58rem;font-weight:700;color:#fff}
+.user-lvl{font-size:.55rem;color:var(--t3);font-family:var(--mono)}
+.btn-urg{padding:6px 12px;background:var(--redf);border:1px solid var(--redb);border-radius:8px;font-family:var(--font);font-size:.65rem;font-weight:700;color:var(--red);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .15s;animation:pulse-red 2.5s infinite;letter-spacing:.04em}
+@keyframes pulse-red{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 4px rgba(255,59,92,.18)}}
+.btn-urg:hover{background:var(--red);color:#fff;box-shadow:var(--gred)}
+.btn-out{padding:5px 11px;background:none;border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:.65rem;color:var(--t3);cursor:pointer;transition:all .15s}
+.btn-out:hover{border-color:var(--red);color:var(--red)}
+
+/* NOTIFICATION QUEUE */
+#notif-queue{position:fixed;top:72px;right:1.5rem;z-index:8000;display:flex;flex-direction:column;gap:7px;pointer-events:none;max-height:calc(100vh - 90px);overflow-y:auto}
+.notif{padding:.62rem .88rem;border-radius:10px;font-size:.72rem;font-weight:500;max-width:340px;display:flex;align-items:flex-start;gap:9px;animation:slideN .28s ease both;border:1px solid;pointer-events:auto;backdrop-filter:blur(12px);line-height:1.45;position:relative}
+@keyframes slideN{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
+.notif-close{position:absolute;top:5px;right:7px;background:none;border:none;color:inherit;font-size:.75rem;cursor:pointer;opacity:.6}.notif-close:hover{opacity:1}
+.notif-time{font-family:var(--mono);font-size:.55rem;opacity:.65;margin-top:2px;display:block}
+.notif.info{background:rgba(21,101,216,.88);border-color:var(--b3);color:#fff}
+.notif.success{background:rgba(0,155,90,.88);border-color:var(--green);color:#fff}
+.notif.warn{background:rgba(185,125,0,.88);border-color:var(--amber);color:#fff}
+.notif.danger{background:rgba(200,25,55,.92);border-color:var(--red);color:#fff}
+.notif.critical{background:rgba(180,10,35,.95);border-color:#FF0030;color:#fff;box-shadow:0 0 20px rgba(255,0,48,.4)}
+
+/* EMERGENCY */
+#emerg-border{display:none;position:fixed;inset:0;z-index:9998;pointer-events:none;border:6px solid var(--red);animation:flash .65s ease infinite}
+@keyframes flash{0%,100%{opacity:0}50%{opacity:1}}
+#emerg-modal{display:none;position:fixed;top:72px;right:1.5rem;z-index:9999;background:#120509;border:1.5px solid var(--red);border-radius:var(--rl);padding:1rem 1.25rem;max-width:310px;box-shadow:var(--gred),0 8px 40px rgba(0,0,0,.7);animation:fadeUp .3s both}
+
+/* MAIN & TABS */
+.main{flex:1;padding:1rem 1.5rem;overflow-y:auto}
+.tp{display:none}.tp.active{display:block}
+
+/* CARDS */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--cs);overflow:hidden}
+.card-hd{display:flex;align-items:center;justify-content:space-between;padding:.72rem .9rem;border-bottom:1px solid var(--border)}
+.card-title{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);display:flex;align-items:center;gap:6px}
+.ctd{width:5px;height:5px;border-radius:50%}
+.ctd.b{background:var(--b2);box-shadow:0 0 6px var(--b2)}.ctd.c{background:var(--cyan);box-shadow:0 0 6px var(--cyan)}.ctd.g{background:var(--green);box-shadow:0 0 6px var(--green)}.ctd.a{background:var(--amber);box-shadow:0 0 6px var(--amber)}.ctd.r{background:var(--red);box-shadow:0 0 6px var(--red)}
+.card-bd{padding:.8rem .9rem}
+.chip{font-family:var(--mono);font-size:.56rem;font-weight:600;padding:2px 7px;border-radius:var(--rpill);letter-spacing:.04em}
+.ch-b{background:var(--bfade);color:var(--b3);border:1px solid var(--bborder)}.ch-c{background:var(--cyanf);color:var(--cyan);border:1px solid var(--cyanb)}.ch-g{background:var(--greenf);color:var(--green);border:1px solid var(--greenb)}.ch-a{background:var(--ambf);color:var(--amber);border:1px solid var(--ambb)}.ch-r{background:var(--redf);color:var(--red);border:1px solid var(--redb)}
+
+/* GAMIFICATION */
+.gam-bar{background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:.8rem 1.1rem;margin-bottom:.9rem;box-shadow:var(--cs);display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+.gam-ring{position:relative;width:72px;height:72px;flex-shrink:0}
+.gam-ring canvas{position:absolute;inset:0}
+.gam-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gam-n{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--green);line-height:1}
+.gam-pct{font-size:.52rem;color:var(--t3);margin-top:1px}
+.gam-metrics{display:flex;gap:1.2rem;flex-wrap:wrap;flex:1}
+.gam-m{text-align:center}
+.gam-mv{font-family:var(--mono);font-size:.95rem;font-weight:700;line-height:1}
+.gam-ml{font-size:.56rem;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-top:3px}
+.gam-badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{padding:3px 9px;border-radius:var(--rpill);font-size:.58rem;font-weight:700;letter-spacing:.04em;border:1px solid}
+.bdg-gold{background:rgba(255,200,0,.12);color:#FFD700;border-color:rgba(255,200,0,.3)}
+.bdg-silver{background:rgba(180,200,220,.1);color:#B0C8DC;border-color:rgba(180,200,220,.28)}
+
+/* PATIENT BANNER */
+.pat-bar{background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:.82rem 1.1rem;display:flex;align-items:center;gap:1rem;margin-bottom:.9rem;box-shadow:var(--cs);flex-wrap:wrap;transition:border-color .2s}
+.pat-av{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#0A47B8,var(--b2));display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;color:#fff;flex-shrink:0;border:2px solid var(--bborder)}
+.pat-name{font-size:.92rem;font-weight:700;letter-spacing:-.15px}
+.pat-id{font-size:.58rem;font-family:var(--mono);color:var(--t3);margin-top:2px}
+.pat-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.tag{font-size:.58rem;font-weight:600;padding:2px 7px;border-radius:var(--rpill)}
+.tb{background:var(--bfade);color:var(--b3);border:1px solid var(--bborder)}.ta{background:var(--ambf);color:var(--amber);border:1px solid var(--ambb)}.tr{background:var(--redf);color:var(--red);border:1px solid var(--redb)}.tc{background:var(--cyanf);color:var(--cyan);border:1px solid var(--cyanb)}
+.pat-vitals{display:flex;gap:1.5rem;padding:0 1.1rem;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+@media(max-width:820px){.pat-vitals{display:none}}
+.pv-val{font-family:var(--mono);font-size:1.12rem;font-weight:600;line-height:1}
+.pv-val.ok{color:var(--green)}.pv-val.warn{color:var(--amber)}.pv-val.crit{color:var(--red)}
+.pv-lbl{font-size:.56rem;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-top:3px}
+.pat-ctas{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.btn{padding:6px 12px;border-radius:8px;font-family:var(--font);font-size:.65rem;font-weight:700;cursor:pointer;border:1px solid;display:flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap}
+.bn-b{background:var(--bfade);color:var(--b3);border-color:var(--bborder)}.bn-b:hover{background:var(--b1);color:#fff}
+.bn-c{background:var(--cyanf);color:var(--cyan);border-color:var(--cyanb)}.bn-c:hover{background:var(--cyan);color:var(--bg)}
+.bn-r{background:var(--redf);color:var(--red);border-color:var(--redb)}.bn-r:hover{background:var(--red);color:#fff}
+
+/* DASHBOARD GRID */
+.dash-grid{display:grid;grid-template-columns:258px 1fr 275px;gap:.9rem;align-items:start}
+@media(max-width:1340px){.dash-grid{grid-template-columns:1fr 1fr}.col-right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:.9rem}}
+@media(max-width:820px){.dash-grid{grid-template-columns:1fr}.col-right{grid-template-columns:1fr}}
+
+/* PRONTUARIO */
+.pr-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:.7rem}
+.pr-row:last-child{border:none}
+.pr-lbl{color:var(--t3)}.pr-val{color:var(--t1);font-weight:500;text-align:right}
+.pr-val.warn{color:var(--amber)}.pr-val.danger{color:var(--red)}.pr-val.ok{color:var(--green)}
+.obs-lbl{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin:.7rem 0 5px}
+.obs-ta{width:100%;padding:.5rem .65rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:.7rem;color:var(--t1);resize:vertical;min-height:72px;outline:none}
+.obs-ta:focus{border-color:var(--b2)}.obs-ta::placeholder{color:var(--t3)}
+.alert-box{margin-top:.62rem;padding:.52rem .65rem;background:rgba(245,166,35,.07);border:1px solid rgba(245,166,35,.22);border-radius:8px}
+.ab-lbl{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--amber);margin-bottom:2px}
+.ab-txt{font-size:.66rem;color:#FDE68A;line-height:1.5}
+
+/* SESSION TIMELINE */
+.timeline{position:relative;padding-left:18px;margin-top:.5rem}
+.timeline::before{content:'';position:absolute;left:6px;top:4px;bottom:0;width:1.5px;background:linear-gradient(to bottom,var(--b2),transparent)}
+.tl-item{position:relative;margin-bottom:10px}
+.tl-item::before{content:'';position:absolute;left:-15px;top:5px;width:8px;height:8px;border-radius:50%;background:var(--panel);border:1.5px solid var(--b2)}
+.tl-item.active::before{background:var(--b2);box-shadow:0 0 8px var(--b2)}
+.tl-item.done::before{background:var(--green);border-color:var(--green)}
+.tl-date{font-family:var(--mono);font-size:.58rem;color:var(--t3)}
+.tl-desc{font-size:.68rem;color:var(--t2);margin-top:1px}
+.tl-score{font-size:.6rem;font-family:var(--mono)}
+.tl-score.ok{color:var(--green)}.tl-score.warn{color:var(--amber)}
+
+/* SENSORS */
+.sensor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:.8rem}
+.sc{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.48rem .58rem}
+.sc-lbl{font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:4px}
+.sc-val{font-family:var(--mono);font-size:.95rem;font-weight:600;color:var(--cyan);line-height:1}
+.sc-val.ok{color:var(--green)}.sc-val.warn{color:var(--amber)}.sc-val.crit{color:var(--red)}
+.sc-unit{font-size:.55rem;color:var(--t3);margin-top:2px}
+.chart-area{position:relative;width:100%}
+
+/* BIO PLAYER */
+.bio-panel{position:relative;background:var(--bg);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.bio-label{position:absolute;top:8px;left:8px;font-size:.58rem;font-family:var(--mono);color:var(--t2);background:rgba(0,0,0,.65);padding:3px 8px;border-radius:var(--rpill);border:1px solid var(--border);backdrop-filter:blur(6px);z-index:2}
+.bio-badge-r{position:absolute;top:8px;right:8px;font-size:.56rem;font-family:var(--mono);color:var(--cyan);background:rgba(0,0,0,.7);padding:3px 8px;border-radius:var(--rpill);border:1px solid var(--cyanb);z-index:2}
+.bio-canvas{display:block;width:100%}
+.bio-controls{position:absolute;bottom:0;left:0;right:0;padding:.45rem .65rem;background:linear-gradient(to top,rgba(0,0,0,.82),transparent);display:flex;align-items:center;gap:6px;z-index:2}
+.bc-btn{padding:3px 8px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.28);border-radius:5px;font-size:.6rem;font-family:var(--font);color:var(--cyan);cursor:pointer;transition:all .15s}
+.bc-btn:hover,.bc-btn.act{background:var(--cyan);color:var(--bg)}
+.bc-tc{font-family:var(--mono);font-size:.58rem;color:var(--t3)}
+.xray-ctrl{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.6);padding:3px 8px;border-radius:var(--rpill);border:1px solid var(--border)}
+.xray-ctrl span{font-size:.58rem;color:var(--cyan);font-family:var(--mono)}
+.xray-ctrl input[type=range]{width:65px;accent-color:var(--cyan);cursor:pointer}
+
+/* PAIN */
+.pain-visual{display:flex;align-items:center;gap:12px;margin-bottom:.65rem}
+.pain-emoji{width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
+.pain-ring-svg{position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px)}
+.pain-info .pl{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--t3)}
+.pain-info .pv{font-size:1rem;font-weight:800;margin-top:2px}
+.pain-info .pc{font-size:.6rem;color:var(--t3);font-family:var(--mono);margin-top:1px}
+.tl-lights{display:flex;gap:5px;margin-top:.6rem}
+.tll{flex:1;text-align:center}
+.tll-bar{height:8px;border-radius:4px;background:var(--bg3);border:1px solid var(--border);overflow:hidden;position:relative}
+.tll-fill{position:absolute;inset:0;border-radius:4px;transition:opacity .4s}
+.tll-lbl{font-size:.56rem;font-weight:700;margin-top:3px}
+
+/* DIAG */
+.diag-item{padding:6px 0;border-bottom:1px solid var(--border)}
+.diag-item:last-child{border:none}
+.diag-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.diag-name{font-size:.7rem;font-weight:600;color:var(--t1)}.diag-pct{font-family:var(--mono);font-size:.66rem;color:var(--b3)}
+.diag-just{font-size:.6rem;color:var(--t3);line-height:1.4;margin-bottom:4px}
+.diag-bg{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.diag-fill{height:100%;border-radius:2px;background:var(--b1);transition:width .6s}
+.diag-fill.top{background:linear-gradient(90deg,var(--b1),var(--cyan))}
+.ai-acts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:.75rem}
+.ai-btn{padding:8px 4px;border-radius:8px;font-family:var(--font);font-size:.66rem;font-weight:700;cursor:pointer;border:1px solid;text-align:center;transition:all .15s;letter-spacing:.04em}
+.ai-acc{background:var(--greenf);color:var(--green);border-color:var(--greenb)}.ai-acc:hover{background:var(--green);color:var(--bg)}
+.ai-edt{background:var(--ambf);color:var(--amber);border-color:var(--ambb)}.ai-edt:hover{background:var(--amber);color:var(--bg)}
+.ai-rej{background:var(--redf);color:var(--red);border-color:var(--redb)}.ai-rej:hover{background:var(--red);color:#fff}
+.ai-note{font-size:.57rem;color:var(--t3);text-align:center;margin-top:5px;line-height:1.45}
+
+/* OITFC */
+.oitfc-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:.9rem}
+@media(max-width:900px){.oitfc-kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);padding:.82rem .9rem;box-shadow:var(--cs)}
+.kpi-lbl{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);margin-bottom:6px}
+.kpi-val{font-family:var(--mono);font-size:1.28rem;font-weight:700;line-height:1}
+.kpi-val.g{color:var(--green)}.kpi-val.b{color:var(--cyan)}.kpi-val.a{color:var(--amber)}
+.kpi-sub{font-size:.58rem;color:var(--t3);margin-top:4px}
+.equip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:.9rem}
+.equip-card{background:var(--panel);border:1px solid var(--border);border-radius:var(--rl);box-shadow:var(--cs);overflow:hidden;transition:border-color .2s}
+.equip-card:hover{border-color:var(--bborder)}
+.eq-hd{display:flex;align-items:center;gap:9px;padding:.82rem .9rem;border-bottom:1px solid var(--border)}
+.eq-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.ei-b{background:var(--bfade);border:1px solid var(--bborder)}.ei-c{background:var(--cyanf);border:1px solid var(--cyanb)}.ei-a{background:var(--ambf);border:1px solid var(--ambb)}.ei-g{background:var(--greenf);border:1px solid var(--greenb)}
+.eq-name{font-size:.78rem;font-weight:700;color:var(--t1)}.eq-model{font-size:.58rem;color:var(--t3);font-family:var(--mono);margin-top:2px}
+.eq-status{margin-left:auto;display:flex;align-items:center;gap:5px;font-size:.58rem;font-weight:700;color:var(--green);letter-spacing:.08em}
+.param-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:.82rem .9rem}
+.pb{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.52rem .62rem}
+.pb-lbl{font-size:.54rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:5px}
+.pb-val{font-family:var(--mono);font-size:.95rem;font-weight:600;color:var(--cyan);line-height:1}
+.pb-unit{font-size:.54rem;color:var(--t3);margin-top:3px}
+.tb-bar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-top:5px}
+.tb-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--b2),var(--amber))}
+.eq-footer{padding:0 .9rem .82rem}
+.eq-spec{font-size:.58rem;color:var(--t3);font-family:var(--mono);margin-bottom:.58rem}
+.btn-ai-adj{width:100%;padding:.58rem;background:var(--bfade);border:1px solid var(--bborder);border-radius:8px;font-family:var(--font);font-size:.68rem;font-weight:700;color:var(--b3);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+.btn-ai-adj:hover{background:var(--b1);color:#fff;border-color:var(--b1)}
+.ai-pill{font-size:.52rem;font-weight:800;background:var(--b1);color:#fff;padding:2px 5px;border-radius:4px;letter-spacing:.05em}
+.btn-ai-adj:hover .ai-pill{background:rgba(255,255,255,.25)}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--rl);padding:1.25rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)}
+.upload-zone:hover{border-color:var(--b2);background:var(--bfade)}
+.uz-icon{font-size:1.5rem;margin-bottom:.5rem}.uz-title{font-size:.78rem;font-weight:600;color:var(--t2);margin-bottom:3px}.uz-sub{font-size:.62rem;color:var(--t3)}
+
+/* EMERGENCY CARD PULSE */
+@keyframes emerg-card{0%,100%{border-color:var(--border);box-shadow:var(--cs)}50%{border-color:var(--red);box-shadow:var(--gred),var(--cs)}}
+.emerg-pulse{animation:emerg-card .7s ease infinite!important}
+
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:.62rem 1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
+.foot-sec{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.foot-lock{display:flex;align-items:center;gap:5px;font-size:.6rem;color:var(--green);font-weight:600}
+.foot-txt{font-size:.58rem;color:var(--t3)}
+.off-chip{display:flex;align-items:center;gap:5px;font-size:.58rem;padding:2px 8px;background:var(--ambf);border:1px solid var(--ambb);border-radius:var(--rpill);color:var(--amber);font-weight:600}
+</style>
+</head>
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loader">
+  <div class="load-logo">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <path d="M5 28 Q18 6 31 28" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="18" cy="15" r="5" fill="white" opacity=".92"/>
+      <path d="M10 24 L26 24" stroke="rgba(255,255,255,.3)" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="load-brand">Fisio<em>trilha</em></div>
+  <div class="load-slogan">monitoramento que transforma resultados</div>
+  <div class="load-bar-wrap"><div class="load-bar" id="loadBar"></div></div>
+  <div class="load-status" id="loadStatus">Inicializando sistema...</div>
+</div>
+
+<!-- EMERGENCY BORDER -->
+<div id="emerg-border"></div>
+<!-- NOTIFICATIONS -->
+<div id="notif-queue"></div>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="screen-login">
+  <div class="login-visual">
+    <div style="position:relative;z-index:1">
+      <svg width="230" height="330" viewBox="0 0 230 330" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(21,101,216,.25)"/><stop offset="100%" stop-color="rgba(0,212,255,.08)"/></linearGradient>
+          <linearGradient id="boneG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8DC8F8"/><stop offset="100%" stop-color="#C0E4FF"/></linearGradient>
+          <filter id="sg"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <linearGradient id="scanG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="50%" stop-color="rgba(0,212,255,.45)"/><stop offset="100%" stop-color="transparent"/></linearGradient>
+        </defs>
+        <!-- Body silhouette -->
+        <g opacity=".25" fill="url(#bodyG)" stroke="rgba(0,212,255,.18)" stroke-width=".8">
+          <ellipse cx="115" cy="35" rx="24" ry="27"/>
+          <rect x="106" y="57" width="18" height="15" rx="4"/>
+          <path d="M75 74 C65 82 61 108 63 148 L65 192 L165 192 L167 148 C169 108 165 82 155 74Z"/>
+          <path d="M63 190 C56 203 55 220 58 234 L77 234 C75 222 76 210 83 200 L147 200 C154 210 155 222 153 234 L172 234 C175 220 174 203 167 190Z"/>
+          <path d="M76 78 C63 86 51 107 45 135 L43 187 L60 191 L63 145 C66 120 70 104 81 96Z"/>
+          <path d="M154 78 C167 86 179 107 185 135 L187 187 L170 191 L167 145 C164 120 160 104 149 96Z"/>
+          <path d="M77 232 C73 253 71 280 72 308 L72 322 L98 322 L100 308 L101 274 L102 232Z"/>
+          <path d="M153 232 C157 253 159 280 158 308 L158 322 L132 322 L130 308 L129 274 L128 232Z"/>
+        </g>
+        <!-- Skeleton -->
+        <g stroke="url(#boneG)" stroke-linecap="round" fill="none" filter="url(#sg)">
+          <line x1="115" y1="65" x2="115" y2="192" stroke-width="2">
+            <animate attributeName="opacity" values=".7;1;.7" dur="2.5s" repeatCount="indefinite"/>
+          </line>
+          <g stroke="rgba(160,210,255,.28)" stroke-width="1">
+            <line x1="110" y1="70" x2="120" y2="70"/><line x1="109" y1="78" x2="121" y2="78"/>
+            <line x1="108" y1="86" x2="122" y2="86"/><line x1="108" y1="96" x2="122" y2="96"/>
+            <line x1="108" y1="107" x2="122" y2="107"/><line x1="108" y1="118" x2="122" y2="118"/>
+          </g>
+          <path d="M115 72 Q96 68 81 78" stroke-width="2.2"/>
+          <path d="M115 72 Q134 68 149 78" stroke-width="2.2"/>
+          <ellipse cx="115" cy="108" rx="36" ry="18" stroke="rgba(160,210,255,.35)" stroke-width="1.4">
+            <animate attributeName="ry" values="18;20;18" dur="3s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="115" cy="124" rx="33" ry="14" stroke="rgba(160,210,255,.26)" stroke-width="1.1"/>
+          <ellipse cx="115" cy="138" rx="29" ry="10" stroke="rgba(160,210,255,.18)" stroke-width=".9"/>
+          <ellipse cx="115" cy="150" rx="24" ry="7"  stroke="rgba(160,210,255,.12)" stroke-width=".7"/>
+          <line x1="115" y1="90" x2="115" y2="158" stroke="rgba(180,220,255,.38)" stroke-width="1.8"/>
+          <path d="M79 192 Q79 210 115 214 Q151 210 151 192" stroke-width="2.2" opacity=".7"/>
+          <line x1="79" y1="192" x2="151" y2="192" stroke-width="1.5" opacity=".5"/>
+          <line x1="81" y1="81" x2="50" y2="146" stroke-width="2.6">
+            <animate attributeName="x2" values="50;48;50" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="y2" values="146;150;146" dur="2s" repeatCount="indefinite"/>
+          </line>
+          <line x1="50" y1="146" x2="38" y2="196" stroke-width="2.2"/>
+          <line x1="149" y1="81" x2="180" y2="146" stroke-width="2.6">
+            <animate attributeName="x2" values="180;182;180" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="y2" values="146;150;146" dur="2s" repeatCount="indefinite"/>
+          </line>
+          <line x1="180" y1="146" x2="192" y2="196" stroke-width="2.2"/>
+          <line x1="92" y1="203" x2="84" y2="274" stroke-width="3">
+            <animate attributeName="x2" values="84;82;84" dur="1.9s" repeatCount="indefinite"/>
+          </line>
+          <line x1="84" y1="274" x2="79" y2="320" stroke-width="2.4"/>
+          <line x1="138" y1="203" x2="146" y2="274" stroke-width="3">
+            <animate attributeName="x2" values="146;148;146" dur="1.9s" repeatCount="indefinite"/>
+          </line>
+          <line x1="146" y1="274" x2="151" y2="320" stroke-width="2.4"/>
+        </g>
+        <!-- Joints -->
+        <g fill="rgba(0,212,255,.92)" filter="url(#sg)">
+          <circle cx="115" cy="62" r="5"><animate attributeName="r" values="4.5;6.5;4.5" dur="1.8s" repeatCount="indefinite"/></circle>
+          <circle cx="81" cy="81" r="4.5"><animate attributeName="r" values="4;6;4" dur="2.1s" repeatCount="indefinite"/></circle>
+          <circle cx="149" cy="81" r="4.5"><animate attributeName="r" values="4;6;4" dur="2.1s" repeatCount="indefinite"/></circle>
+          <circle cx="50" cy="146" r="4"><animate attributeName="r" values="3.5;5.5;3.5" dur="2.3s" repeatCount="indefinite"/></circle>
+          <circle cx="180" cy="146" r="4"><animate attributeName="r" values="3.5;5.5;3.5" dur="2.3s" repeatCount="indefinite"/></circle>
+          <circle cx="38" cy="196" r="3.5"/><circle cx="192" cy="196" r="3.5"/>
+          <circle cx="92" cy="203" r="4.5"/><circle cx="138" cy="203" r="4.5"/>
+          <circle cx="84" cy="274" r="5.5"><animate attributeName="r" values="5;7;5" dur="1.6s" repeatCount="indefinite"/></circle>
+          <circle cx="146" cy="274" r="5.5"><animate attributeName="r" values="5;7;5" dur="1.6s" repeatCount="indefinite"/></circle>
+          <circle cx="79" cy="320" r="3.5"/><circle cx="151" cy="320" r="3.5"/>
+        </g>
+        <!-- Knee angle arcs -->
+        <g fill="none" stroke="#FFE566" stroke-width="1.5" opacity=".9">
+          <path d="M78 264 A17 17 0 0 1 93 261"/>
+          <path d="M152 261 A17 17 0 0 1 137 264"/>
+        </g>
+        <text x="57" y="270" fill="#FFE566" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="500">142°</text>
+        <text x="149" y="270" fill="#FFE566" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="500">138°</text>
+        <!-- Scan beam -->
+        <rect x="0" y="0" width="8" height="330" fill="url(#scanG)" opacity=".55">
+          <animateTransform attributeName="transform" type="translate" from="-8,0" to="238,0" dur="2.8s" repeatCount="indefinite"/>
+        </rect>
+        <text x="8" y="326" fill="rgba(0,212,255,.4)" font-family="'JetBrains Mono',monospace" font-size="8">BIOMECHANICAL SCAN · ±2.03°</text>
+      </svg>
+    </div>
+    <div class="lv-title">Fisio<span>trilha</span><br>OITFC v3</div>
+    <div class="lv-sub">Sharp Consulting Group · 2025</div>
+    <div class="lv-feats">
+      <div class="lv-feat"><div class="lv-feat-dot"></div>Análise biomecânica OpenPose ±2.03°</div>
+      <div class="lv-feat"><div class="lv-feat-dot"></div>Orquestração IoT em tempo real</div>
+      <div class="lv-feat"><div class="lv-feat-dot"></div>IA diagnóstica com controle médico RF06</div>
+      <div class="lv-feat"><div class="lv-feat-dot"></div>Conformidade LGPD · TLS 1.3 · AES-256</div>
+    </div>
+  </div>
+  <div class="login-form-side">
+    <div class="lc">
+      <div class="lc-brand">
+        <div class="lc-mark"><svg width="28" height="28" viewBox="0 0 36 36" fill="none"><path d="M5 28 Q18 6 31 28" stroke="white" stroke-width="2.8" fill="none" stroke-linecap="round"/><circle cx="18" cy="15" r="4.5" fill="white" opacity=".92"/></svg></div>
+        <div><div class="lc-name">Fisio<em>trilha</em></div><div class="lc-tag">monitoramento que transforma resultados</div></div>
+      </div>
+      <div class="lc-h">Acesso Seguro · OITFC Sistema Clínico v3</div>
+      <div class="fld"><label>Usuário / CRM</label><input type="text" value="dr.silva@hospital.org"></div>
+      <div class="fld"><label>Senha</label><input type="password" value="12345678"></div>
+      <div class="fld mono"><label>Token MFA (RF10)</label><input type="text" value="A3F7-9B21-CC45-8E02"></div>
+      <div class="lgpd-note">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3A92FF" stroke-width="2.5" style="flex-shrink:0;margin-top:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>Sessão criptografada <strong>TLS 1.3 · AES-256-GCM</strong>. Dados protegidos conforme <strong>LGPD Art. 6°, 11° e 46°</strong>. Log imutável RF08.</span>
+      </div>
+      <button class="btn-enter" onclick="doLogin()">Entrar no Sistema</button>
+      <div class="lc-footer">Sharp Consulting Group · Fisiotrilha OITFC v3.0 · © 2025</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="screen-app">
+  <div class="audit-bar">
+    <div class="ab-chip"><div class="ab-dot"></div>TLS 1.3</div>
+    <div class="ab-chip"><div class="ab-dot"></div>AES-256-GCM</div>
+    <div class="ab-chip"><div class="ab-dot"></div>LGPD Compliant</div>
+    <span style="color:var(--border2)">|</span>
+    <span>Sessão: <span style="color:var(--t2)">FT-2025-A3F7-9B21</span></span>
+    <span style="color:var(--border2)">|</span>
+    <span>Acesso: <span style="color:var(--t2)">MÉDICO SÊNIOR · RF10 ✓ · RF08 ✓</span></span>
+    <span style="color:var(--border2)">|</span>
+    <span>Tempo: <span style="color:var(--t2)" id="sess-t">00:00</span></span>
+  </div>
+
+  <div class="topbar">
+    <div class="tb-brand">
+      <div class="tb-mark"><svg width="20" height="20" viewBox="0 0 36 36" fill="none"><path d="M5 28 Q18 6 31 28" stroke="white" stroke-width="2.8" fill="none" stroke-linecap="round"/><circle cx="18" cy="15" r="4" fill="white" opacity=".92"/></svg></div>
+      <div class="tb-name">Fisio<em>trilha</em></div>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-ver">OITFC v3.0 · Sharp CG</div>
+    <div class="tb-spacer"></div>
+    <div class="tb-tabs">
+      <button class="ttab active" onclick="switchTab('dashboard',this)">Dashboard</button>
+      <button class="ttab" onclick="switchTab('oitfc',this)">Orquestração OITFC</button>
+      <button class="ttab" onclick="switchTab('evolucao',this)">Evolução</button>
+      <button class="ttab" onclick="switchTab('dados',this)">Dados &amp; DICOM</button>
+    </div>
+    <div class="tb-right">
+      <div class="live-pill"><div class="live-dot"></div>ONLINE</div>
+      <div class="user-pill">
+        <div class="user-av">DS</div>
+        <div><div>Dr. Silva · CRM 48.291</div><div class="user-lvl">MÉDICO SÊNIOR · RF10</div></div>
+      </div>
+      <button class="btn-urg" onclick="triggerEmerg()">🚨 Urgência</button>
+      <button class="btn-out" onclick="doLogout()">Sair</button>
+    </div>
+  </div>
+
+  <div id="emerg-modal">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:1.3rem">🚨</span><span style="font-size:.76rem;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.06em">Alerta Crítico — Urgência</span></div>
+    <div style="font-size:.7rem;color:#FFAAAA;line-height:1.55;margin-bottom:10px">IA detectou <strong style="color:#fff">risco de AVC/Infarto</strong>.<br>PA: <strong>178/106</strong> · FC: <strong>122 bpm</strong> · SpO₂: <strong>90%</strong><br><span style="font-size:.6rem;opacity:.7">Protocolo emergência ativado · RF08 log gerado</span></div>
+    <div style="display:flex;gap:7px">
+      <button style="flex:1;padding:8px;background:var(--red);border:none;border-radius:8px;color:#fff;font-family:var(--font);font-size:.68rem;font-weight:700;cursor:pointer" onclick="dismissEmerg()">Acionar Equipe</button>
+      <button style="flex:1;padding:8px;background:none;border:1px solid var(--border);border-radius:8px;color:var(--t2);font-family:var(--font);font-size:.68rem;cursor:pointer" onclick="dismissEmerg()">Dispensar</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+  <!-- ═══ DASHBOARD TAB ═══ -->
+  <div class="tp active" id="tab-dashboard">
+
+    <!-- Gamification Bar -->
+    <div class="gam-bar">
+      <div style="flex-shrink:0;text-align:center">
+        <div class="gam-ring"><canvas id="gamRing" width="72" height="72"></canvas>
+          <div class="gam-num"><div class="gam-n">87</div><div class="gam-pct">score</div></div>
+        </div>
+        <div style="font-size:.58rem;color:var(--t3);margin-top:4px">Adesão</div>
+      </div>
+      <div class="gam-metrics">
+        <div class="gam-m"><div class="gam-mv" style="color:var(--green)">12/24</div><div class="gam-ml">Sessões</div></div>
+        <div class="gam-m"><div class="gam-mv" style="color:var(--cyan)">94%</div><div class="gam-ml">Comparec.</div></div>
+        <div class="gam-m"><div class="gam-mv" style="color:var(--amber)">+41%</div><div class="gam-ml">Melhora Dor</div></div>
+        <div class="gam-m"><div class="gam-mv" style="color:var(--b3)">4.2°</div><div class="gam-ml">Δ Postura</div></div>
+        <div class="gam-m"><div class="gam-mv" style="color:var(--green)">3x</div><div class="gam-ml">Exerc./dia</div></div>
+      </div>
+      <div class="gam-badges">
+        <div class="badge bdg-gold">🏆 Consistente</div>
+        <div class="badge bdg-silver">⭐ 10 Sessões</div>
+        <div class="badge bdg-gold">💪 Melhora Rápida</div>
+      </div>
+    </div>
+
+    <!-- Patient Banner -->
+    <div class="pat-bar" id="patBar">
+      <div class="pat-av">MF</div>
+      <div style="flex:1">
+        <div class="pat-name">Maria Ferreira</div>
+        <div class="pat-id">Prt# 2025-08-14371 · Admissão: 02/06/2025 · Sessão 12/24</div>
+        <div class="pat-tags">
+          <span class="tag tb">65 anos · F · O+</span><span class="tag tb">M54.5 Lombalgia</span>
+          <span class="tag tb">M47.8 Espondilose</span><span class="tag ta">HAS · DM2</span>
+          <span class="tag tr">⚠ Alergia: AINES</span><span class="tag tc">LBP-Advanced v2</span>
+        </div>
+      </div>
+      <div class="pat-vitals">
+        <div><div class="pv-val warn" id="bv-pa">148/92</div><div class="pv-lbl">PA mmHg</div></div>
+        <div><div class="pv-val ok" id="bv-fc">78</div><div class="pv-lbl">FC bpm</div></div>
+        <div><div class="pv-val ok" id="bv-sp">96%</div><div class="pv-lbl">SpO₂</div></div>
+        <div><div class="pv-val" id="bv-tm">36.5°</div><div class="pv-lbl">Temp.</div></div>
+      </div>
+      <div class="pat-ctas">
+        <button class="btn bn-b" onclick="gerarLaudo()">📄 Laudo PDF</button>
+        <button class="btn bn-c" onclick="notify('info','🩻 DICOM: Carregando 312 slices · HL7 FHIR R4 ativo.')">🩻 DICOM</button>
+        <button class="btn bn-r" onclick="triggerEmerg()">🚨 Urgência</button>
+      </div>
+    </div>
+
+    <!-- 3-col grid -->
+    <div class="dash-grid">
+
+      <!-- COL LEFT: Prontuário + Timeline + Sensors -->
+      <div style="display:flex;flex-direction:column;gap:.9rem">
+        <div class="card">
+          <div class="card-hd"><div class="card-title"><span class="ctd b"></span>Prontuário Eletrônico</div><span class="chip ch-g">PEP Online</span></div>
+          <div class="card-bd">
+            <div class="pr-row"><span class="pr-lbl">CID Principal</span><span class="pr-val">M54.5 – Lombalgia</span></div>
+            <div class="pr-row"><span class="pr-lbl">CID Secundário</span><span class="pr-val">M47.8 – Espondilose</span></div>
+            <div class="pr-row"><span class="pr-lbl">Medicação</span><span class="pr-val">Losartana 50mg · Metformina</span></div>
+            <div class="pr-row"><span class="pr-lbl">Alergia</span><span class="pr-val danger">AINES (Ibuprofeno)</span></div>
+            <div class="pr-row"><span class="pr-lbl">IMC</span><span class="pr-val">27.4 kg/m²</span></div>
+            <div class="pr-row"><span class="pr-lbl">Última RNM</span><span class="pr-val">Hérnia L4–L5 confirmada</span></div>
+            <div class="pr-row"><span class="pr-lbl">Fisioterapeuta</span><span class="pr-val">Dra. Ana Rodrigues</span></div>
+            <div class="obs-lbl">Observações Clínicas</div>
+            <textarea class="obs-ta" placeholder="Registrar observações...">Melhora ~40% na dor lombar. Limitação flexão anterior &lt;60°. Marcha preservada. Sem irradiação para MMII.</textarea>
+            <div class="alert-box" style="margin-top:.6rem">
+              <div class="ab-lbl">⚠ Alerta Cardiovascular IA</div>
+              <div class="ab-txt">PA 148/92 mmHg — risco moderado detectado. Monitoramento contínuo recomendado.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><div class="card-title"><span class="ctd b"></span>Timeline de Sessões</div><span class="chip ch-b">12/24</span></div>
+          <div class="card-bd">
+            <div class="timeline">
+              <div class="tl-item active">
+                <div class="tl-date">08/06/2025 — Sessão 12 (Atual)</div>
+                <div class="tl-desc">TENS 80Hz + Ultrassom 1MHz + Laser 830nm</div>
+                <div class="tl-score warn">Dor: Médio · Postura: 7.2° · Score: 87</div>
+              </div>
+              <div class="tl-item done">
+                <div class="tl-date">05/06/2025 — Sessão 11</div>
+                <div class="tl-desc">TENS 80Hz + Correntes Russas</div>
+                <div class="tl-score ok">Dor: Baixo · Postura: 6.8° · Score: 91 ↑</div>
+              </div>
+              <div class="tl-item done">
+                <div class="tl-date">02/06/2025 — Sessão 10</div>
+                <div class="tl-desc">Ultrassom 3MHz + Laser terapêutico</div>
+                <div class="tl-score ok">Dor: Baixo · Postura: 8.1° · Score: 84</div>
+              </div>
+              <div class="tl-item done">
+                <div class="tl-date">29/05/2025 — Sessão 9</div>
+                <div class="tl-desc">TENS 60Hz + Exercícios ativos</div>
+                <div class="tl-score warn">Dor: Médio · Postura: 9.2° · Score: 78</div>
+              </div>
+              <div class="tl-item done">
+                <div class="tl-date">26/05/2025 — Sessão 8</div>
+                <div class="tl-desc">Avaliação clínica + Ultrassom</div>
+                <div class="tl-score ok">Dor: Médio-Baixo · Score: 82</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><div class="card-title"><span class="ctd g"></span>Sensores IoT — Tempo Real</div><span class="chip ch-g">Sync 3s</span></div>
+          <div class="card-bd">
+            <div class="sensor-grid">
+              <div class="sc"><div class="sc-lbl">EMG L2/L3</div><div class="sc-val" id="sv-emg">0.42</div><div class="sc-unit">mV RMS</div></div>
+              <div class="sc"><div class="sc-lbl">Postura</div><div class="sc-val" id="sv-pos">7.2°</div><div class="sc-unit">Inclinação</div></div>
+              <div class="sc"><div class="sc-lbl">SpO₂</div><div class="sc-val ok" id="sv-sp">96%</div><div class="sc-unit">Oximetria</div></div>
+              <div class="sc"><div class="sc-lbl">FC</div><div class="sc-val ok" id="sv-fc">78</div><div class="sc-unit">bpm</div></div>
+              <div class="sc"><div class="sc-lbl">PA Sistólica</div><div class="sc-val warn" id="sv-pa">148</div><div class="sc-unit">mmHg</div></div>
+              <div class="sc"><div class="sc-lbl">Temperatura</div><div class="sc-val" id="sv-tmp">36.5°</div><div class="sc-unit">°C corporal</div></div>
+            </div>
+            <div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--t3);margin-bottom:5px">EMG Eletromiografia</div>
+            <div class="chart-area" style="height:90px"><canvas id="emgChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COL CENTER: Biomechanics -->
+      <div style="display:flex;flex-direction:column;gap:.9rem">
+        <div class="card">
+          <div class="card-hd">
+            <div class="card-title"><span class="ctd c"></span>Análise Biomecânica — Visão Transparente</div>
+            <div style="display:flex;gap:4px"><span class="chip ch-c">OpenPose ±2.03°</span><span class="chip ch-b">RF12</span></div>
+          </div>
+          <div class="card-bd">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:.65rem;flex-wrap:wrap">
+              <span style="font-size:.58rem;color:var(--t3);font-family:var(--mono)">MODO:</span>
+              <button class="bc-btn act" id="modeNow" onclick="setBioMode('live',this)">Ao Vivo</button>
+              <button class="bc-btn" id="modeComp" onclick="setBioMode('compare',this)">Antes / Depois</button>
+              <div class="xray-ctrl" style="margin-left:auto">
+                <span>Transparência:</span>
+                <input type="range" id="xraySlider" min="0" max="100" value="65" oninput="setXray(this.value)">
+                <span id="xrayPct">65%</span>
+              </div>
+            </div>
+
+            <!-- LIVE -->
+            <div id="bio-live">
+              <div class="bio-panel" style="margin-bottom:.5rem">
+                <div class="bio-label">🔴 AO VIVO · 1920×1080 · 30fps</div>
+                <div class="bio-badge-r">OpenPose ±2.03°</div>
+                <canvas class="bio-canvas" id="bioCanvas" height="230"></canvas>
+                <div class="bio-controls">
+                  <button class="bc-btn" id="playBtn" onclick="togglePlay(this)">▶ Play</button>
+                  <button class="bc-btn" id="recBtn" onclick="toggleRec(this)">⏺ REC</button>
+                  <span class="bc-tc" id="tcDisp">00:00:00</span>
+                  <span class="bc-tc" style="margin-left:auto">H.264 · AVC</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- COMPARE -->
+            <div id="bio-compare" style="display:none">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.6rem">
+                <div class="bio-panel">
+                  <div class="bio-label">📅 Sessão 1 — Antes</div>
+                  <canvas class="bio-canvas" id="bioCanvasBefore" height="190"></canvas>
+                </div>
+                <div class="bio-panel">
+                  <div class="bio-label" style="background:rgba(0,201,122,.18);border-color:var(--greenb);color:var(--green)">✅ Sessão 12 — Atual</div>
+                  <canvas class="bio-canvas" id="bioCanvasAfter" height="190"></canvas>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.5rem .65rem">
+                  <div style="font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:5px">Sessão 1 — Antes</div>
+                  <div style="font-family:var(--mono);font-size:.65rem;color:var(--amber)">J.Esq: 128.4° · J.Dir: 125.2°</div>
+                  <div style="font-family:var(--mono);font-size:.65rem;color:var(--amber)">Pelve: 12.8° · EMG: 0.82 mV</div>
+                </div>
+                <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.5rem .65rem">
+                  <div style="font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:5px">Sessão 12 — Atual</div>
+                  <div style="font-family:var(--mono);font-size:.65rem;color:var(--green)">J.Esq: 142.1° +13.7° ↑</div>
+                  <div style="font-family:var(--mono);font-size:.65rem;color:var(--green)">Pelve: 5.2° -7.6° ↑ · EMG: 0.42 mV</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--t3);margin:.82rem 0 5px">Séries Temporais — Ângulos Articulares · ±2.03°</div>
+            <div class="chart-area" style="height:130px"><canvas id="angleChart"></canvas></div>
+            <div style="display:flex;gap:10px;margin-top:5px;flex-wrap:wrap">
+              <span style="display:flex;align-items:center;gap:3px;font-size:.58rem;color:var(--t3)"><span style="width:10px;height:2px;background:var(--b1);display:inline-block;border-radius:1px"></span>J.Esq.</span>
+              <span style="display:flex;align-items:center;gap:3px;font-size:.58rem;color:var(--t3)"><span style="width:10px;height:2px;background:#00B09B;display:inline-block;border-radius:1px"></span>J.Dir.</span>
+              <span style="display:flex;align-items:center;gap:3px;font-size:.58rem;color:var(--t3)"><span style="width:10px;height:2px;background:var(--amber);display:inline-block;border-radius:1px"></span>Pelve</span>
+              <span style="display:flex;align-items:center;gap:3px;font-size:.58rem;color:var(--t3)"><span style="width:10px;height:2px;background:var(--cyan);display:inline-block;border-radius:1px"></span>Cotovelo</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><div class="card-title"><span class="ctd g"></span>SpO₂ · FC · PA — Vitais em Tempo Real</div><span class="chip ch-c">HL7 FHIR</span></div>
+          <div class="card-bd"><div class="chart-area" style="height:105px"><canvas id="vitalsChart"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- COL RIGHT: AI + Diagnostics -->
+      <div class="col-right" style="display:flex;flex-direction:column;gap:.9rem">
+
+        <div class="card">
+          <div class="card-hd"><div class="card-title"><span class="ctd a"></span>Escala de Esforço Facial</div><span class="chip ch-a">CNN 96% (RF04)</span></div>
+          <div class="card-bd">
+            <div class="pain-visual">
+              <div class="pain-emoji" id="painEmoji" style="background:var(--ambf)">
+                <svg class="pain-ring-svg" viewBox="0 0 78 78"><circle cx="39" cy="39" r="36" fill="none" stroke="var(--amber)" stroke-width="2.5" stroke-dasharray="200" stroke-dashoffset="80" stroke-linecap="round"/></svg>
+                <span id="painEmojiChar" style="font-size:1.8rem">😐</span>
+              </div>
+              <div class="pain-info">
+                <div class="pl">Nível de Dor</div>
+                <div class="pv" id="painLv" style="color:var(--amber)">Médio</div>
+                <div class="pc">Confiança: <span id="painConf">83.4%</span></div>
+                <div class="pc">CNN v3.2 · Acurácia: 96.0%</div>
+              </div>
+            </div>
+            <div class="tl-lights">
+              <div class="tll"><div class="tll-bar"><div class="tll-fill" style="background:var(--green);opacity:.28"></div></div><div class="tll-lbl" style="color:var(--green)">Baixo</div></div>
+              <div class="tll"><div class="tll-bar"><div class="tll-fill" style="background:var(--amber);opacity:1"></div></div><div class="tll-lbl" style="color:var(--amber)">Médio ←</div></div>
+              <div class="tll"><div class="tll-bar"><div class="tll-fill" style="background:var(--red);opacity:.22"></div></div><div class="tll-lbl" style="color:var(--red)">Alto</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><div class="card-title"><span class="ctd b"></span>Suporte Diagnóstico IA</div><div style="display:flex;gap:3px"><span class="chip ch-b">MedGPT 4.1</span><span class="chip ch-b">RF06</span></div></div>
+          <div class="card-bd">
+            <div class="diag-item">
+              <div class="diag-h"><span class="diag-name">Hérnia Discal L4–L5</span><span class="diag-pct">78.4%</span></div>
+              <div class="diag-just">Confirmada por RNM. Déficit EMG L4–L5 detectado em tempo real.</div>
+              <div class="diag-bg"><div class="diag-fill top" style="width:78.4%"></div></div>
+            </div>
+            <div class="diag-item">
+              <div class="diag-h"><span class="diag-name">Estenose Canal Lombar</span><span class="diag-pct">54.1%</span></div>
+              <div class="diag-just">Claudicação neurogênica. Alteração postural detectada pelo OpenPose.</div>
+              <div class="diag-bg"><div class="diag-fill" style="width:54.1%"></div></div>
+            </div>
+            <div class="diag-item">
+              <div class="diag-h"><span class="diag-name">Síndrome Miofascial</span><span class="diag-pct">38.7%</span></div>
+              <div class="diag-just">Espasmo paravertebral. EMG elevado em repouso (>0.6 mV).</div>
+              <div class="diag-bg"><div class="diag-fill" style="width:38.7%;background:var(--b2)"></div></div>
+            </div>
+            <div class="diag-item">
+              <div class="diag-h"><span class="diag-name">Instabilidade Lombar</span><span class="diag-pct">21.3%</span></div>
+              <div class="diag-just">Pelve desalinhada 5.2° via sensor IMU vestível.</div>
+              <div class="diag-bg"><div class="diag-fill" style="width:21.3%;background:var(--t3)"></div></div>
+            </div>
+            <div style="padding:.58rem .65rem;background:var(--bfade);border:1px solid var(--bborder);border-radius:8px;margin:.65rem 0">
+              <div style="font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--b3);margin-bottom:3px">Recomendação IA (RF04)</div>
+              <div style="font-size:.68rem;color:var(--t2);line-height:1.5">TENS 80Hz + Ultrassom 1MHz para L4–L5. Reduzir carga 20%. Repetir RNM em 30 dias.</div>
+            </div>
+            <div class="ai-acts">
+              <button class="ai-btn ai-acc" onclick="aiDecision('accept')">✓ Aceitar</button>
+              <button class="ai-btn ai-edt" onclick="aiDecision('edit')">✎ Editar</button>
+              <button class="ai-btn ai-rej" onclick="aiDecision('reject')">✗ Rejeitar</button>
+            </div>
+            <div class="ai-note">RF06 · A IA apoia — decisão clínica final é exclusiva do médico.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><div class="card-title"><span class="ctd a"></span>Risco Cardiovascular</div><span class="chip ch-a">8.2% · Moderado</span></div>
+          <div class="card-bd">
+            <div class="chart-area" style="height:105px;margin-bottom:.5rem"><canvas id="riskChart"></canvas></div>
+            <div style="font-size:.68rem;color:var(--t2);line-height:1.5">Prob. evento 24h: <strong style="color:var(--amber)">8.2%</strong>. PA elevada persistente. Monitoramento contínuo indicado.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ OITFC TAB ═══ -->
+  <div class="tp" id="tab-oitfc">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.9rem;gap:1rem;flex-wrap:wrap">
+      <div>
+        <div style="font-size:.88rem;font-weight:700;color:var(--t1)">Orquestração Inteligente de Terapias Fisioterapêuticas Conectadas</div>
+        <div style="font-size:.62rem;color:var(--t3);font-family:var(--mono);margin-top:3px">Paciente: Maria Ferreira · Sessão #12 · LBP-Advanced v2 · 4 dispositivos</div>
+      </div>
+      <span class="chip ch-g" style="font-size:.6rem;padding:4px 10px">● Todos Online</span>
+    </div>
+    <div class="oitfc-kpis">
+      <div class="kpi"><div class="kpi-lbl">Tempo Sessão</div><div class="kpi-val b" id="kpi-time">32:17</div><div class="kpi-sub">de 45 min prescritos</div></div>
+      <div class="kpi"><div class="kpi-lbl">Resposta Terapêutica</div><div class="kpi-val g">+41%</div><div class="kpi-sub">vs. sessão anterior</div></div>
+      <div class="kpi"><div class="kpi-lbl">Ajustes IA</div><div class="kpi-val b" id="kpi-adj">0</div><div class="kpi-sub">nesta sessão</div></div>
+      <div class="kpi"><div class="kpi-lbl">LGPD Compliance</div><div class="kpi-val g">100%</div><div class="kpi-sub">RNF01 · Anonimizado</div></div>
+    </div>
+    <div class="equip-grid">
+      <div class="equip-card">
+        <div class="eq-hd"><div class="eq-icon ei-b">⚡</div><div><div class="eq-name">Eletroestimulador TENS/FES</div><div class="eq-model">PhysioStim Pro 3000 · CH1–CH4</div></div><div class="eq-status"><div style="width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite"></div>ATIVO</div></div>
+        <div class="param-grid">
+          <div class="pb"><div class="pb-lbl">Intensidade Corrente</div><div class="pb-val" id="t-int">28</div><div class="pb-unit">mA</div></div>
+          <div class="pb"><div class="pb-lbl">Frequência</div><div class="pb-val" id="t-freq">80</div><div class="pb-unit">Hz</div></div>
+          <div class="pb"><div class="pb-lbl">Tempo de Uso</div><div class="pb-val" id="t-time">18:42</div><div class="pb-unit">min:seg</div></div>
+          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="t-temp">36.8</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:52%"></div></div></div>
+        </div>
+        <div class="eq-footer"><div class="eq-spec">Onda bifásica simétrica · Pulso: 250µs · Rampa: 2s↑/2s↓</div><button class="btn-ai-adj" onclick="aiAdjust('tens')"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
+      </div>
+      <div class="equip-card">
+        <div class="eq-hd"><div class="eq-icon ei-c">🔴</div><div><div class="eq-name">Laser Terapêutico</div><div class="eq-model">LaserMed Twin 830nm · L4–L5</div></div><div class="eq-status"><div style="width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite"></div>ATIVO</div></div>
+        <div class="param-grid">
+          <div class="pb"><div class="pb-lbl">Intensidade</div><div class="pb-val" id="l-int">100</div><div class="pb-unit">mW</div></div>
+          <div class="pb"><div class="pb-lbl">Comprimento de Onda</div><div class="pb-val" id="l-freq">830</div><div class="pb-unit">nm</div></div>
+          <div class="pb"><div class="pb-lbl">Tempo de Uso</div><div class="pb-val" id="l-time">05:20</div><div class="pb-unit">min:seg</div></div>
+          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="l-temp">28.3</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:28%"></div></div></div>
+        </div>
+        <div class="eq-footer"><div class="eq-spec">Dose: 4 J/cm² · Pontual contínuo · 3 pontos · 1cm²</div><button class="btn-ai-adj" onclick="aiAdjust('laser')"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
+      </div>
+      <div class="equip-card">
+        <div class="eq-hd"><div class="eq-icon ei-a">〰️</div><div><div class="eq-name">Ultrassom Terapêutico</div><div class="eq-model">SonoMed Plus · 5cm² · Para-espinhal L4</div></div><div class="eq-status"><div style="width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite"></div>ATIVO</div></div>
+        <div class="param-grid">
+          <div class="pb"><div class="pb-lbl">Intensidade</div><div class="pb-val" id="u-int">1.5</div><div class="pb-unit">W/cm²</div></div>
+          <div class="pb"><div class="pb-lbl">Frequência</div><div class="pb-val" id="u-freq">1</div><div class="pb-unit">MHz</div></div>
+          <div class="pb"><div class="pb-lbl">Tempo de Uso</div><div class="pb-val" id="u-time">08:15</div><div class="pb-unit">min:seg</div></div>
+          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="u-temp">37.2</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:68%"></div></div></div>
+        </div>
+        <div class="eq-footer"><div class="eq-spec">Pulsado 20% · SATA: 0.3 W/cm² · SATP: 1.5 W/cm²</div><button class="btn-ai-adj" onclick="aiAdjust('us')"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
+      </div>
+      <div class="equip-card">
+        <div class="eq-hd"><div class="eq-icon ei-g">🌊</div><div><div class="eq-name">Correntes Russas</div><div class="eq-model">NeuroMod Elite · Quadriceps bilateral</div></div><div class="eq-status"><div style="width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite"></div>ATIVO</div></div>
+        <div class="param-grid">
+          <div class="pb"><div class="pb-lbl">Intensidade Corrente</div><div class="pb-val" id="r-int">35</div><div class="pb-unit">mA</div></div>
+          <div class="pb"><div class="pb-lbl">Frequência</div><div class="pb-val" id="r-freq">2500</div><div class="pb-unit">Hz</div></div>
+          <div class="pb"><div class="pb-lbl">Tempo de Uso</div><div class="pb-val" id="r-time">10:00</div><div class="pb-unit">min:seg</div></div>
+          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="r-temp">36.4</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:48%"></div></div></div>
+        </div>
+        <div class="eq-footer"><div class="eq-spec">Burst: 50Hz · Ciclo: 10s ON/10s OFF · Rampa: 3s</div><button class="btn-ai-adj" onclick="aiAdjust('russas')"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ EVOLUÇÃO TAB ═══ -->
+  <div class="tp" id="tab-evolucao">
+    <div style="font-size:.88rem;font-weight:700;color:var(--t1);margin-bottom:.9rem">Evolução por Sessões — Comparativo de Progresso</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:.9rem">
+      <div class="card"><div class="card-hd"><div class="card-title"><span class="ctd r"></span>Escala de Dor VAS (0–10)</div><span class="chip ch-g">12 sessões</span></div><div class="card-bd"><div class="chart-area" style="height:175px"><canvas id="evoDorChart"></canvas></div></div></div>
+      <div class="card"><div class="card-hd"><div class="card-title"><span class="ctd c"></span>Ângulo Pelve (°) — Postura</div><span class="chip ch-c">OpenPose</span></div><div class="card-bd"><div class="chart-area" style="height:175px"><canvas id="evoPelveChart"></canvas></div></div></div>
+      <div class="card"><div class="card-hd"><div class="card-title"><span class="ctd b"></span>Score de Adesão Terapêutica</div><span class="chip ch-b">Gamificação</span></div><div class="card-bd"><div class="chart-area" style="height:175px"><canvas id="evoScoreChart"></canvas></div></div></div>
+      <div class="card"><div class="card-hd"><div class="card-title"><span class="ctd a"></span>PA Sistólica (mmHg)</div><span class="chip ch-a">Tendência</span></div><div class="card-bd"><div class="chart-area" style="height:175px"><canvas id="evoPAChart"></canvas></div></div></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title"><span class="ctd b"></span>Tabela Comparativa — Histórico Completo</div></div>
+      <div class="card-bd" style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:.68rem">
+          <thead><tr style="border-bottom:1px solid var(--border2)">
+            <th style="text-align:left;padding:6px 8px;color:var(--t3);font-size:.56rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Sessão</th>
+            <th style="text-align:center;padding:6px 8px;color:var(--t3);font-size:.56rem;text-transform:uppercase;font-weight:700">Data</th>
+            <th style="text-align:center;padding:6px 8px;color:var(--t3);font-size:.56rem;text-transform:uppercase;font-weight:700">Dor VAS</th>
+            <th style="text-align:center;padding:6px 8px;color:var(--t3);font-size:.56rem;text-transform:uppercase;font-weight:700">Pelve °</th>
+            <th style="text-align:center;padding:6px 8px;color:var(--t3);font-size:.56rem;text-transform:uppercase;font-weight:700">J.Esq °</th>
+            <th style="text-align:center;padding:6px 8px;color:var(--t3);font-size:.56rem;text-transform:uppercase;font-weight:700">PA mmHg</th>
+            <th style="text-align:center;padding:6px 8px;color:var(--t3);font-size:.56rem;text-transform:uppercase;font-weight:700">Score</th>
+            <th style="text-align:center;padding:6px 8px;color:var(--t3);font-size:.56rem;text-transform:uppercase;font-weight:700">Status</th>
+          </tr></thead>
+          <tbody id="evoTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ DADOS TAB ═══ -->
+  <div class="tp" id="tab-dados">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem;max-width:880px">
+      <div>
+        <div class="card" style="margin-bottom:.9rem">
+          <div class="card-hd"><div class="card-title"><span class="ctd c"></span>Upload de Arquivos Clínicos</div><span class="chip ch-c">RNF05</span></div>
+          <div class="card-bd">
+            <div class="upload-zone" onclick="simUpload()">
+              <div class="uz-icon">📁</div>
+              <div class="uz-title">Soltar arquivos ou clicar para selecionar</div>
+              <div class="uz-sub">DICOM · PDF · PNG · JPG · NIfTI</div>
+              <div style="display:flex;gap:5px;justify-content:center;margin-top:.6rem;flex-wrap:wrap">
+                <span class="tag tc">.dcm</span><span class="tag tb">.pdf</span><span class="tag tb">.png</span><span class="tag tb">.jpg</span><span class="tag tb">.nii</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><div class="card-title"><span class="ctd g"></span>Arquivos Recentes</div></div>
+          <div class="card-bd">
+            <div class="pr-row"><span class="pr-lbl">RMN_Coluna_L4L5.dcm</span><span class="pr-val ok">✓ 312 slices</span></div>
+            <div class="pr-row"><span class="pr-lbl">Laudo_RMN_2025-06.pdf</span><span class="pr-val ok">✓ Importado</span></div>
+            <div class="pr-row"><span class="pr-lbl">EMG_Baseline_2025.pdf</span><span class="pr-val ok">✓ Processado</span></div>
+            <div class="pr-row"><span class="pr-lbl">Foto_Sessao11_Postura.jpg</span><span class="pr-val ok">✓ 2.4 MB</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:.9rem">
+          <div class="card-hd"><div class="card-title"><span class="ctd a"></span>Modo Contingência Offline</div><span class="chip ch-a">RNF09</span></div>
+          <div class="card-bd">
+            <div style="padding:.65rem;background:var(--ambf);border:1px solid var(--ambb);border-radius:9px;margin-bottom:.7rem">
+              <div style="font-size:.6rem;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:3px">Status: Online</div>
+              <div style="font-size:.68rem;color:var(--t2);line-height:1.5">Sistema sincronizado. Cache local ativo. Suporte offline por 72h com dados completos do paciente.</div>
+            </div>
+            <div class="pr-row"><span class="pr-lbl">Cache local</span><span class="pr-val ok">Ativo · 124 MB</span></div>
+            <div class="pr-row"><span class="pr-lbl">Última sincronização</span><span class="pr-val">Há 2 minutos</span></div>
+            <div class="pr-row"><span class="pr-lbl">Autonomia offline</span><span class="pr-val ok">72 horas</span></div>
+            <div class="pr-row"><span class="pr-lbl">Criptografia local</span><span class="pr-val ok">AES-256-GCM ✓</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-hd"><div class="card-title"><span class="ctd g"></span>Segurança &amp; LGPD</div><span class="chip ch-g">Compliant</span></div>
+          <div class="card-bd">
+            <div class="pr-row"><span class="pr-lbl">Criptografia em trânsito</span><span class="pr-val ok">TLS 1.3 ✓</span></div>
+            <div class="pr-row"><span class="pr-lbl">Criptografia em repouso</span><span class="pr-val ok">AES-256-GCM ✓</span></div>
+            <div class="pr-row"><span class="pr-lbl">LGPD Art. 6° e 46°</span><span class="pr-val ok">Compliant ✓</span></div>
+            <div class="pr-row"><span class="pr-lbl">Log auditoria RF08</span><span class="pr-val ok">Imutável ✓</span></div>
+            <div class="pr-row"><span class="pr-lbl">Retenção de dados</span><span class="pr-val">5 anos · CFM 1.638</span></div>
+            <div class="pr-row"><span class="pr-lbl">Anonimização</span><span class="pr-val ok">Ativa ✓</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- .main -->
+
+  <footer>
+    <div class="foot-sec">
+      <div class="foot-lock">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        TLS 1.3 · AES-256-GCM
+      </div>
+      <div class="foot-txt">LGPD Art. 6°, 11°, 46° · Dados sensíveis de saúde (RNF01)</div>
+      <div class="foot-txt">|</div>
+      <div class="foot-txt">Retenção: 5 anos — CFM 1.638/2002</div>
+      <div class="foot-txt">|</div>
+      <div class="off-chip"><span style="width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block"></span>Offline: 72h (RNF09)</div>
+    </div>
+    <div style="font-size:.56rem;color:var(--t3);font-family:var(--mono)">Sharp Consulting Group · Fisiotrilha OITFC v3.0 · © 2025 · Build 20250608</div>
+  </footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  LOADER
+// ══════════════════════════════════════════
+const steps=[
+  [0,'Verificando certificados TLS 1.3...'],
+  [14,'Autenticando token MFA (RF10)...'],
+  [26,'Conectando sensores IoT...'],
+  [40,'Carregando prontuário eletrônico...'],
+  [55,'Inicializando OpenPose ±2.03°...'],
+  [68,'Sincronizando equipamentos OITFC...'],
+  [82,'Carregando modelos IA — CNN 96%...'],
+  [94,'Aplicando criptografia AES-256-GCM...'],
+  [100,'Sistema pronto.']
+];
+let si=0;
+function runLoader(){
+  if(si>=steps.length){
+    setTimeout(()=>{
+      document.getElementById('loader').classList.add('out');
+      setTimeout(()=>{
+        document.getElementById('loader').style.display='none';
+        document.getElementById('screen-login').style.display='grid';
+      },520);
+    },350);
+    return;
+  }
+  const[pct,msg]=steps[si++];
+  document.getElementById('loadBar').style.width=pct+'%';
+  document.getElementById('loadStatus').textContent=msg;
+  setTimeout(runLoader,si===steps.length?550:260);
+}
+setTimeout(runLoader,500);
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let emergActive=false,playing=false,recording=false;
+let sessSec=0,vidSec=0,adjCount=0,bioMode='live',bioPhase=0,bioAnim;
+let xrayVal=0.65;
+let emgC,vitC,angC,rskC,gamC,evoDC,evoPelC,evoSC,evoPAC;
+let notifList=[];
+
+// ══════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════
+function doLogin(){
+  document.getElementById('screen-login').style.display='none';
+  const app=document.getElementById('screen-app');
+  app.style.display='flex';app.style.flexDirection='column';
+  setTimeout(()=>{
+    initCharts();startBioCanvas();startLive();startTimers();populateEvoTable();
+    notify('success','🔐 Autenticação RF10 confirmada — TLS 1.3 ativo. Bem-vindo, Dr. Silva.');
+    setTimeout(()=>notify('info','📡 4 equipamentos IoT conectados. Sensores vestíveis sincronizados.'),1800);
+  },120);
+}
+function doLogout(){
+  document.getElementById('screen-app').style.display='none';
+  document.getElementById('screen-login').style.display='grid';
+  cancelAnimationFrame(bioAnim);
+}
+
+// ══════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════
+function switchTab(id,btn){
+  document.querySelectorAll('.ttab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  if(id==='evolucao')renderEvoCharts();
+}
+
+// ══════════════════════════════════════════
+//  NOTIFICATIONS
+// ══════════════════════════════════════════
+function notify(type,msg,dur=5000){
+  const zone=document.getElementById('notif-queue');
+  const id='n'+Date.now()+Math.random();
+  const el=document.createElement('div');
+  el.className='notif '+type;el.id=id;
+  const now=new Date();
+  const ts=[now.getHours(),now.getMinutes(),now.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+  el.innerHTML=`<div style="flex:1"><div>${msg}</div><span class="notif-time">${ts}</span></div><button class="notif-close" onclick="closeNotif('${id}')">✕</button>`;
+  zone.appendChild(el);
+  notifList.push(id);
+  if(notifList.length>5){closeNotif(notifList.shift())}
+  setTimeout(()=>closeNotif(id),dur);
+}
+function closeNotif(id){
+  const el=document.getElementById(id);
+  if(el){el.style.opacity='0';el.style.transform='translateX(20px)';el.style.transition='all .3s';setTimeout(()=>el.remove(),300);}
+  notifList=notifList.filter(n=>n!==id);
+}
+
+// ══════════════════════════════════════════
+//  EMERGENCY
+// ══════════════════════════════════════════
+function triggerEmerg(){
+  emergActive=!emergActive;
+  const border=document.getElementById('emerg-border'),modal=document.getElementById('emerg-modal'),bar=document.getElementById('patBar');
+  if(emergActive){
+    border.style.display='block';modal.style.display='block';bar.classList.add('emerg-pulse');
+    playBeep();
+    notify('critical','🚨 ALERTA CRÍTICO — IA: risco AVC/Infarto. PA:178/106 · FC:122 · SpO₂:90%. ACIONE EQUIPE!',12000);
+  } else dismissEmerg();
+}
+function dismissEmerg(){
+  emergActive=false;
+  document.getElementById('emerg-border').style.display='none';
+  document.getElementById('emerg-modal').style.display='none';
+  document.getElementById('patBar').classList.remove('emerg-pulse');
+  notify('success','✓ Alerta dispensado. Paciente estabilizado. RF08 log registrado.');
+}
+function playBeep(){
+  try{
+    const ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [900,1100,900,1100,900,1100].forEach((f,i)=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=f;o.type='square';
+      const t=ctx.currentTime+i*.26;
+      g.gain.setValueAtTime(.22,t);g.gain.exponentialRampToValueAtTime(.001,t+.2);
+      o.start(t);o.stop(t+.2);
+    });
+  }catch(e){}
+}
+
+// ══════════════════════════════════════════
+//  AI DECISIONS
+// ══════════════════════════════════════════
+function aiDecision(t){
+  const m={accept:['success','✓ Diagnóstico IA aceito (RF06). Registrado no prontuário com assinatura digital CFM.'],edit:['info','✎ Modo edição ativo (RF06). Ajuste as probabilidades conforme avaliação clínica.'],reject:['warn','✗ Sugestão IA rejeitada (RF06). Diagnóstico manual do médico será registrado.']};
+  notify(m[t][0],m[t][1]);
+}
+function gerarLaudo(){notify('success','📄 Laudo PDF gerado: Laudo_MariaFerreira_14371.pdf — AES-256 · LGPD · Assinatura CFM aplicada.');}
+function simUpload(){
+  notify('info','📂 Processando arquivo... Verificando integridade · Criptografando · Indexando PEP (RNF05).');
+  setTimeout(()=>notify('success','✓ Arquivo importado com sucesso. Criptografado e indexado no log de auditoria RF08.'),2000);
+}
+
+// ══════════════════════════════════════════
+//  OITFC AI ADJUST
+// ══════════════════════════════════════════
+const adjData={
+  tens:{v:[[26,60],[30,100],[28,80],[24,50]],m:'TENS: Intensidade otimizada. Frequência ajustada para efeito analgésico prolongado.'},
+  laser:{v:[[80,660],[120,830],[100,904],[90,830]],m:'Laser: Dose ajustada para L4–L5 inflamatório. Wavelength para perfil tecidual.'},
+  us:{v:[[1.0,1],[2.0,3],[1.8,1],[1.2,3]],m:'Ultrassom: Intensidade reduzida com base na temperatura tissular detectada.'},
+  russas:{v:[[30,2500],[40,2500],[35,2500],[25,2500]],m:'Correntes Russas: Recalibrado via feedback EMG dos sensores vestíveis.'}
+};
+function aiAdjust(eq){
+  adjCount++;
+  const kpi=document.getElementById('kpi-adj');if(kpi)kpi.textContent=adjCount;
+  const d=adjData[eq],v=d.v[Math.floor(Math.random()*d.v.length)],p={tens:'t',laser:'l',us:'u',russas:'r'}[eq];
+  const e1=document.getElementById(p+'-int'),e2=document.getElementById(p+'-freq');
+  if(e1)e1.textContent=v[0];if(e2)e2.textContent=v[1];
+  notify('info','🤖 IA OITFC: '+d.m);
+}
+
+// ══════════════════════════════════════════
+//  BIO MODE & CONTROLS
+// ══════════════════════════════════════════
+function setBioMode(mode,btn){
+  bioMode=mode;
+  document.querySelectorAll('[id^=mode]').forEach(b=>b.classList.remove('act'));
+  btn.classList.add('act');
+  document.getElementById('bio-live').style.display=mode==='live'?'block':'none';
+  document.getElementById('bio-compare').style.display=mode==='compare'?'block':'none';
+  if(mode==='compare')drawCompareFrames();
+}
+function setXray(v){xrayVal=v/100;document.getElementById('xrayPct').textContent=v+'%';}
+function togglePlay(btn){playing=!playing;btn.textContent=playing?'⏸ Pause':'▶ Play';btn.classList.toggle('act',playing);}
+function toggleRec(btn){recording=!recording;btn.textContent=recording?'⏹ STOP':'⏺ REC';btn.classList.toggle('act',recording);if(recording)notify('warn','⏺ Gravação iniciada. Timestamp criptografado ativo.');}
+
+// ══════════════════════════════════════════
+//  BIOMECHANICS CANVAS — Human figure with X-ray skeleton
+// ══════════════════════════════════════════
+function startBioCanvas(){
+  const canvas=document.getElementById('bioCanvas');
+  if(!canvas)return;
+  function resize(){const p=canvas.parentElement;canvas.width=p.offsetWidth||620;canvas.height=230;}
+  resize();window.addEventListener('resize',resize);
+  function loop(){bioPhase+=0.018;drawBioFrame(canvas,bioPhase,true);bioAnim=requestAnimationFrame(loop);}
+  loop();
+}
+
+function drawBioFrame(canvas,phase,isAfter){
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  // Background + grid
+  ctx.fillStyle='#030B18';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(21,101,216,.04)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // Moving scan beam
+  const sx=((phase*32)%W);
+  const sg=ctx.createLinearGradient(sx-22,0,sx+22,0);
+  sg.addColorStop(0,'transparent');sg.addColorStop(.5,'rgba(0,212,255,.07)');sg.addColorStop(1,'transparent');
+  ctx.fillStyle=sg;ctx.fillRect(0,0,W,H);
+
+  const cx=W*.5,cy=H*.48;
+  const sc=Math.min(W/520,H/290)*.88;
+
+  // Animation values — subtle, realistic
+  const breathe=Math.sin(phase*.85)*.8;
+  const kOsc=isAfter?Math.sin(phase*.5)*2.5:Math.sin(phase*.5)*6;
+  const armSwing=Math.sin(phase*.5)*4;
+
+  ctx.save();
+  ctx.translate(cx,cy);ctx.scale(sc,sc);
+
+  // ── Body silhouette (clean anatomical) ──
+  ctx.globalAlpha=0.2;
+  ctx.fillStyle='rgba(30,120,255,.6)';
+  ctx.strokeStyle='rgba(0,212,255,.18)';ctx.lineWidth=1;
+
+  // Head
+  ctx.beginPath();ctx.ellipse(0,-148,24,28,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // Neck
+  ctx.beginPath();ctx.roundRect(-9,-122,18,16,3);ctx.fill();ctx.stroke();
+  // Torso (breathing animation on width)
+  const tw=50+breathe*.4;
+  ctx.beginPath();
+  ctx.moveTo(-tw,-108);ctx.bezierCurveTo(-tw-10,-90,-tw-14,-55,-tw-12,5);
+  ctx.lineTo(tw+12,5);ctx.bezierCurveTo(tw+14,-55,tw+10,-90,tw,-108);
+  ctx.closePath();ctx.fill();ctx.stroke();
+  // Hips
+  ctx.beginPath();
+  ctx.moveTo(-tw-12,3);ctx.bezierCurveTo(-tw-18,16,-tw-18,34,-tw-12,48);
+  ctx.lineTo(-30,50);ctx.bezierCurveTo(-20,42,-10,38,0,38);
+  ctx.bezierCurveTo(10,38,20,42,30,50);
+  ctx.lineTo(tw+12,48);ctx.bezierCurveTo(tw+18,34,tw+18,16,tw+12,3);
+  ctx.fill();ctx.stroke();
+  // Left arm
+  const lax=-armSwing*.3;
+  ctx.beginPath();ctx.moveTo(-tw,-104);ctx.bezierCurveTo(-tw-16,-88,-tw-22,-58,-tw-20+lax,-24);
+  ctx.bezierCurveTo(-tw-10+lax,-18,-tw-2+lax,-20,-tw+lax,-26);
+  ctx.bezierCurveTo(-tw-4,-60,-tw-8,-86,-tw+8,-100);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-tw-20+lax,-24);ctx.bezierCurveTo(-tw-24+lax,-6,-tw-26+lax,16,-tw-26+lax,36);
+  ctx.bezierCurveTo(-tw-16+lax,38,-tw-8+lax,36,-tw-6+lax,30);
+  ctx.bezierCurveTo(-tw-6+lax,10,-tw-4+lax,-12,-tw+lax,-26);ctx.fill();ctx.stroke();
+  // Right arm
+  const rax=armSwing*.3;
+  ctx.beginPath();ctx.moveTo(tw,-104);ctx.bezierCurveTo(tw+16,-88,tw+22,-58,tw+20+rax,-24);
+  ctx.bezierCurveTo(tw+10+rax,-18,tw+2+rax,-20,tw+rax,-26);
+  ctx.bezierCurveTo(tw+4,-60,tw+8,-86,tw-8,-100);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(tw+20+rax,-24);ctx.bezierCurveTo(tw+24+rax,-6,tw+26+rax,16,tw+26+rax,36);
+  ctx.bezierCurveTo(tw+16+rax,38,tw+8+rax,36,tw+6+rax,30);
+  ctx.bezierCurveTo(tw+6+rax,10,tw+4+rax,-12,tw+rax,-26);ctx.fill();ctx.stroke();
+  // Left thigh
+  ctx.beginPath();ctx.moveTo(-28,48);ctx.bezierCurveTo(-32,70,-34,98,-30+kOsc*.6,128);
+  ctx.lineTo(-10+kOsc*.6,130);ctx.bezierCurveTo(-10,98,-8,68,-6,48);ctx.fill();ctx.stroke();
+  // Left shin
+  ctx.beginPath();ctx.moveTo(-30+kOsc*.6,128);ctx.bezierCurveTo(-32+kOsc*.6,152,-32+kOsc*.6,175,-32+kOsc*.6,200);
+  ctx.lineTo(-10+kOsc*.6,200);ctx.bezierCurveTo(-10+kOsc*.6,175,-10+kOsc*.6,152,-10+kOsc*.6,128);ctx.fill();ctx.stroke();
+  // Right thigh
+  ctx.beginPath();ctx.moveTo(28,48);ctx.bezierCurveTo(32,70,34,98,30-kOsc*.6,128);
+  ctx.lineTo(10-kOsc*.6,130);ctx.bezierCurveTo(10,98,8,68,6,48);ctx.fill();ctx.stroke();
+  // Right shin
+  ctx.beginPath();ctx.moveTo(30-kOsc*.6,128);ctx.bezierCurveTo(32-kOsc*.6,152,32-kOsc*.6,175,32-kOsc*.6,200);
+  ctx.lineTo(10-kOsc*.6,200);ctx.bezierCurveTo(10-kOsc*.6,175,10-kOsc*.6,152,10-kOsc*.6,128);ctx.fill();ctx.stroke();
+
+  ctx.globalAlpha=xrayVal;
+
+  // ── X-Ray skeleton ──
+  ctx.lineCap='round';
+
+  function bone(x1,y1,x2,y2,w){
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
+    ctx.strokeStyle='rgba(140,210,255,.1)';ctx.lineWidth=w+5;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
+    ctx.strokeStyle='rgba(180,225,255,.62)';ctx.lineWidth=w;ctx.stroke();
+  }
+
+  function joint(x,y,r,highlight){
+    ctx.beginPath();ctx.arc(x,y,r+3,0,Math.PI*2);
+    ctx.fillStyle='rgba(0,212,255,.06)';ctx.fill();
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle=highlight?'rgba(0,220,255,.95)':'rgba(0,212,255,.82)';
+    if(highlight){ctx.shadowColor='rgba(0,212,255,.7)';ctx.shadowBlur=10;}
+    ctx.fill();ctx.shadowBlur=0;
+    if(r>=6){ctx.beginPath();ctx.arc(x,y,r+4,0,Math.PI*2);ctx.strokeStyle='rgba(0,212,255,.22)';ctx.lineWidth=1.5;ctx.stroke();}
+    ctx.beginPath();ctx.arc(x,y,r*.4,0,Math.PI*2);ctx.fillStyle='rgba(200,240,255,.6)';ctx.fill();
+  }
+
+  // Spine
+  bone(0,-138,0,10,2.5);
+  ctx.strokeStyle='rgba(160,210,255,.22)';ctx.lineWidth=1;
+  for(let i=0;i<12;i++){const y=-130+i*10;ctx.beginPath();ctx.moveTo(-9,y);ctx.lineTo(9,y);ctx.stroke();}
+  // Clavicles
+  bone(0,-116,-tw,-104,2.5);bone(0,-116,tw,-104,2.5);
+  // Ribcage
+  for(let i=0;i<7;i++){ctx.beginPath();ctx.ellipse(0,-92+i*14,40-i*2,17-i*1.5,0,0,Math.PI*2);ctx.strokeStyle=`rgba(160,210,255,${.32-.04*i})`;ctx.lineWidth=1.5-.1*i;ctx.stroke();}
+  // Sternum
+  ctx.strokeStyle='rgba(180,220,255,.38)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,-116);ctx.lineTo(0,-22);ctx.stroke();
+  // Pelvis
+  ctx.strokeStyle='rgba(160,210,255,.45)';ctx.lineWidth=2.2;
+  ctx.beginPath();ctx.arc(0,24,50,0,Math.PI);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-50,24);ctx.lineTo(50,24);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-50,24);ctx.bezierCurveTo(-58,34,-60,48,-52,58);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(50,24);ctx.bezierCurveTo(58,34,60,48,52,58);ctx.stroke();
+
+  // Arms
+  bone(-tw,-104,-tw-20+lax,-24,3.5);bone(-tw-20+lax,-24,-tw-26+lax,36,3);
+  bone(tw,-104,tw+20+rax,-24,3.5);bone(tw+20+rax,-24,tw+26+rax,36,3);
+  // Legs
+  bone(-20,40,-20+kOsc*.6,128,5);bone(-20+kOsc*.6,128,-20+kOsc*.6,200,4);
+  bone(20,40,20-kOsc*.6,128,5);bone(20-kOsc*.6,128,20-kOsc*.6,200,4);
+
+  ctx.globalAlpha=1;
+  // Joints
+  joint(0,-152,6,true);
+  joint(-tw,-104,5.5,true);joint(tw,-104,5.5,true);
+  joint(-tw-20+lax,-24,5,false);joint(tw+20+rax,-24,5,false);
+  joint(-tw-26+lax,36,4,false);joint(tw+26+rax,36,4,false);
+  joint(-20,40,5,true);joint(20,40,5,true);joint(0,10,4.5,false);
+  joint(-20+kOsc*.6,128,7,true);joint(20-kOsc*.6,128,7,true);
+  joint(-20+kOsc*.6,200,4.5,false);joint(20-kOsc*.6,200,4.5,false);
+
+  // Knee angle arcs
+  const lkx=-20+kOsc*.6,rkx=20-kOsc*.6;
+  ctx.strokeStyle='#FFE566';ctx.lineWidth=1.8;ctx.setLineDash([]);
+  ctx.beginPath();ctx.arc(lkx,128,22,-Math.PI*.58,-Math.PI*.08);ctx.stroke();
+  ctx.beginPath();ctx.arc(rkx,128,22,-Math.PI*.92,-Math.PI*.42);ctx.stroke();
+
+  // Angle labels
+  const lkD=isAfter?(142+Math.sin(phase*.4)*2.03).toFixed(2):(128+Math.sin(phase*.4)*2.03).toFixed(2);
+  const rkD=isAfter?(138+Math.sin(phase*.35)*2.03).toFixed(2):(125+Math.sin(phase*.35)*2.03).toFixed(2);
+  const pvD=(isAfter?5.2:12.8+Math.sin(phase*.3)*(isAfter?.4:.8)).toFixed(2);
+
+  ctx.font="bold 9.5px 'JetBrains Mono',monospace";ctx.textAlign='left';
+  function aTag(x,y,txt,col){
+    const tw2=ctx.measureText(txt).width;
+    ctx.fillStyle='rgba(0,0,0,.78)';ctx.beginPath();
+    ctx.roundRect(x-4,y-13,tw2+8,17,3);ctx.fill();
+    ctx.strokeStyle=col||'rgba(0,212,255,.35)';ctx.lineWidth=.8;ctx.stroke();
+    ctx.fillStyle=col||'#FFE566';ctx.fillText(txt,x,y);
+  }
+  aTag(lkx-52,150,'J.Esq: '+lkD+'°','#FFE566');
+  aTag(rkx+6,150,'J.Dir: '+rkD+'°','#FFE566');
+  aTag(-18,22,'Pelve: '+pvD+'°','rgba(0,212,255,.9)');
+
+  // LIVE / precision badges
+  const lx=-W/(2*sc)+10,ly=-H/(2*sc)+12;
+  ctx.fillStyle='rgba(0,0,0,.72)';ctx.beginPath();ctx.roundRect(lx,ly,70,16,3);ctx.fill();
+  ctx.beginPath();ctx.arc(lx+6,ly+8,4.5,0,Math.PI*2);
+  ctx.fillStyle=recording?'#FF3B5C':`rgba(255,59,92,${Math.abs(Math.sin(phase*2))*.4+.5})`;ctx.fill();
+  ctx.fillStyle='#fff';ctx.font="600 8px 'JetBrains Mono',monospace";
+  ctx.fillText(recording?'● REC':'● AO VIVO',lx+14,ly+10);
+
+  const prx=W/(2*sc)-108,pry=-H/(2*sc)+7;
+  ctx.fillStyle='rgba(0,0,0,.72)';ctx.beginPath();ctx.roundRect(prx,pry,106,16,3);ctx.fill();
+  ctx.strokeStyle='rgba(0,212,255,.3)';ctx.lineWidth=.8;ctx.stroke();
+  ctx.fillStyle='rgba(0,212,255,.9)';ctx.font="8.5px 'JetBrains Mono',monospace";
+  ctx.fillText('OpenPose · ±2.03°',prx+4,pry+10);
+
+  ctx.restore();
+}
+
+function drawCompareFrames(){
+  const cb=document.getElementById('bioCanvasBefore'),ca=document.getElementById('bioCanvasAfter');
+  if(!cb||!ca)return;
+  [cb,ca].forEach(c=>{const p=c.parentElement;c.width=p.offsetWidth||300;c.height=190;});
+  let ph=0;
+  function cl(){
+    ph+=0.018;
+    if(document.getElementById('bio-compare').style.display!=='none'){
+      drawBioFrame(cb,ph,false);drawBioFrame(ca,ph,true);
+      requestAnimationFrame(cl);
+    }
+  }
+  cl();
+}
+
+// ══════════════════════════════════════════
+//  CHARTS
+// ══════════════════════════════════════════
+function rnd(n,b,a){return Array.from({length:n},()=>+(b+(Math.random()-.5)*a).toFixed(2));}
+const L30=Array.from({length:30},(_,i)=>`-${30-i}s`);
+const bOpts={responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{enabled:false}}};
+function gO(){return{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.22)',font:{size:9,family:"'JetBrains Mono',monospace"}}};}
+
+function initCharts(){
+  gamC=new Chart(document.getElementById('gamRing'),{type:'doughnut',data:{labels:['Score','Rest'],datasets:[{data:[87,13],backgroundColor:['#00C97A','rgba(255,255,255,.05)'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'78%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+
+  emgC=new Chart(document.getElementById('emgChart'),{type:'line',data:{labels:L30,datasets:[{data:rnd(30,.42,.42),borderColor:'#00D4FF',backgroundColor:'rgba(0,212,255,.05)',borderWidth:1.5,pointRadius:0,tension:.35,fill:true}]},options:{...bOpts,scales:{x:{...gO(),ticks:{...gO().ticks,maxTicksLimit:6}},y:{...gO(),min:-.7,max:1.4}}}});
+
+  vitC=new Chart(document.getElementById('vitalsChart'),{type:'line',data:{labels:L30,datasets:[{data:rnd(30,96,2.5),borderColor:'#00C97A',borderWidth:1.5,pointRadius:0,tension:.4,yAxisID:'y'},{data:rnd(30,78,10),borderColor:'#F5A623',borderWidth:1.5,pointRadius:0,tension:.4,yAxisID:'y2',borderDash:[4,2]},{data:rnd(30,148,12),borderColor:'#FF3B5C',borderWidth:1.2,pointRadius:0,tension:.4,yAxisID:'y3',borderDash:[2,3]}]},options:{...bOpts,scales:{x:{...gO(),ticks:{...gO().ticks,maxTicksLimit:6}},y:{...gO(),min:90,max:100,position:'left',ticks:{...gO().ticks,color:'#00C97A'}},y2:{...gO(),min:55,max:115,position:'right',ticks:{...gO().ticks,color:'#F5A623'},grid:{display:false}},y3:{display:false,min:100,max:200}}}});
+
+  angC=new Chart(document.getElementById('angleChart'),{type:'line',data:{labels:L30,datasets:[{data:rnd(30,142,20),borderColor:'#1565D8',borderWidth:1.5,pointRadius:0,tension:.4},{data:rnd(30,138,18),borderColor:'#00B09B',borderWidth:1.5,pointRadius:0,tension:.4,borderDash:[4,2]},{data:rnd(30,5.2,3.5),borderColor:'#F5A623',borderWidth:1.5,pointRadius:0,tension:.4,borderDash:[2,3]},{data:rnd(30,98,14),borderColor:'#00D4FF',borderWidth:1.2,pointRadius:0,tension:.4,borderDash:[3,4]}]},options:{...bOpts,scales:{x:{...gO(),ticks:{...gO().ticks,maxTicksLimit:8}},y:{...gO(),title:{display:true,text:'(°)',font:{size:9},color:'rgba(255,255,255,.22)'}}}}});
+
+  rskC=new Chart(document.getElementById('riskChart'),{type:'doughnut',data:{labels:['Risco','Seguro'],datasets:[{data:[8.2,91.8],backgroundColor:['#F5A623','rgba(255,255,255,.06)'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed}%`}}}}});
+}
+
+function renderEvoCharts(){
+  if(evoDC)return;
+  const sess=Array.from({length:12},(_,i)=>'S'+(i+1));
+  const dor=[8,7.5,7,6.5,6,5.8,5.5,5,4.8,4.5,4.2,3.8];
+  const pelve=[12.8,12.2,11.5,10.8,10.1,9.5,8.8,8.2,7.5,7.0,6.4,5.2];
+  const score=[62,65,68,70,72,75,77,80,82,84,86,87];
+  const pa=[168,165,162,158,158,154,152,152,150,150,148,148];
+  const evoBase={responsive:true,maintainAspectRatio:false,animation:{duration:800},plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.22)',font:{size:9,family:"'JetBrains Mono',monospace"}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'rgba(255,255,255,.22)',font:{size:9,family:"'JetBrains Mono',monospace"}}}}};
+  const ln=(c,lbl)=>({label:lbl,borderColor:c,backgroundColor:c.replace('rgb','rgba').replace(')',', 0.1)'),borderWidth:2.5,pointRadius:3,pointBackgroundColor:c,tension:.4,fill:true});
+  evoDC=new Chart(document.getElementById('evoDorChart'),{type:'line',data:{labels:sess,datasets:[{...ln('#FF3B5C','Dor VAS'),data:dor}]},options:evoBase});
+  evoPelC=new Chart(document.getElementById('evoPelveChart'),{type:'line',data:{labels:sess,datasets:[{...ln('#00D4FF','Pelve °'),data:pelve}]},options:evoBase});
+  evoSC=new Chart(document.getElementById('evoScoreChart'),{type:'bar',data:{labels:sess,datasets:[{label:'Score',data:score,backgroundColor:score.map(v=>v>=85?'rgba(0,201,122,.7)':v>=75?'rgba(21,101,216,.7)':'rgba(245,166,35,.7)'),borderRadius:4}]},options:evoBase});
+  evoPAC=new Chart(document.getElementById('evoPAChart'),{type:'line',data:{labels:sess,datasets:[{...ln('#F5A623','PA'),data:pa}]},options:evoBase});
+}
+
+function populateEvoTable(){
+  const tbody=document.getElementById('evoTableBody');if(!tbody)return;
+  const rows=[[1,'26/04','8.0','12.8°','128.4°','168/102',62,'Inicial'],[2,'29/04','7.5','12.2°','130.1°','165/100',65,'↑'],[3,'02/05','7.0','11.5°','132.8°','162/98',68,'↑'],[4,'05/05','6.5','10.8°','134.5°','158/96',70,'↑'],[5,'08/05','6.0','10.1°','136.2°','158/95',72,'↑'],[6,'12/05','5.8','9.5°','137.0°','154/94',75,'↑'],[7,'15/05','5.5','8.8°','138.8°','152/93',77,'↑'],[8,'19/05','5.0','8.2°','139.5°','152/92',80,'↑'],[9,'22/05','4.8','7.5°','140.2°','150/92',82,'↑'],[10,'26/05','4.5','7.0°','141.0°','150/92',84,'↑'],[11,'02/06','4.2','6.8°','141.8°','148/92',86,'↑'],[12,'08/06','3.8','5.2°','142.1°','148/92',87,'✅ Atual']];
+  tbody.innerHTML=rows.map(([s,d,dor,pv,jk,pa,sc,st])=>{
+    const dc=parseFloat(dor)>6?'var(--red)':parseFloat(dor)>4?'var(--amber)':'var(--green)';
+    const pc=parseFloat(pv)>10?'var(--amber)':'var(--green)';
+    const pac=parseFloat(pa)>160?'var(--red)':parseFloat(pa)>150?'var(--amber)':'var(--t1)';
+    const sc2=sc>=85?'var(--green)':sc>=75?'var(--b3)':'var(--amber)';
+    return `<tr style="border-bottom:1px solid var(--border);cursor:pointer" onmouseover="this.style.background='var(--panel2)'" onmouseout="this.style.background=''">
+      <td style="padding:6px 8px;font-family:var(--mono);color:var(--b3);font-weight:600">#${s}</td>
+      <td style="padding:6px 8px;text-align:center;color:var(--t3);font-family:var(--mono)">${d}</td>
+      <td style="padding:6px 8px;text-align:center;font-family:var(--mono);color:${dc}">${dor}</td>
+      <td style="padding:6px 8px;text-align:center;font-family:var(--mono);color:${pc}">${pv}</td>
+      <td style="padding:6px 8px;text-align:center;font-family:var(--mono);color:var(--cyan)">${jk}</td>
+      <td style="padding:6px 8px;text-align:center;font-family:var(--mono);color:${pac}">${pa}</td>
+      <td style="padding:6px 8px;text-align:center;font-family:var(--mono);color:${sc2}">${sc}</td>
+      <td style="padding:6px 8px;text-align:center;font-size:.62rem;color:${s===12?'var(--green)':'var(--t3)'}">${st}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+//  LIVE DATA (3s interval)
+// ══════════════════════════════════════════
+function startLive(){
+  setInterval(()=>{
+    const r=(b,a)=>+(b+(Math.random()-.5)*a).toFixed(2);
+    const ri=(b,a)=>Math.round(b+(Math.random()-.5)*a);
+    const spo2=ri(96,2),fc=ri(78,8),pa=ri(148,12);
+    const $=id=>document.getElementById(id);
+    if($('sv-emg'))$('sv-emg').textContent=r(.42,.18);
+    if($('sv-pos'))$('sv-pos').textContent=r(7.2,2.2).toFixed(1)+'°';
+    if($('sv-sp')){$('sv-sp').textContent=spo2+'%';$('sv-sp').className='sc-val '+(spo2<94?'crit':spo2<96?'warn':'ok');}
+    if($('sv-fc')){$('sv-fc').textContent=fc;$('sv-fc').className='sc-val '+(fc>100?'warn':'ok');}
+    if($('sv-pa')){$('sv-pa').textContent=pa;$('sv-pa').className='sc-val '+(pa>160?'crit':pa>140?'warn':'');}
+    if($('sv-tmp'))$('sv-tmp').textContent=r(36.5,.3).toFixed(1)+'°';
+    if($('bv-pa'))$('bv-pa').textContent=pa+'/92';
+    if($('bv-fc'))$('bv-fc').textContent=fc;
+    if($('bv-sp'))$('bv-sp').textContent=spo2+'%';
+    if($('bv-tm'))$('bv-tm').textContent=r(36.5,.3).toFixed(1)+'°';
+    if(emgC){emgC.data.datasets[0].data.shift();emgC.data.datasets[0].data.push(r(.42,.42));emgC.update('none');}
+    if(vitC){vitC.data.datasets[0].data.shift();vitC.data.datasets[0].data.push(+(96+(Math.random()-.5)*2.5).toFixed(1));vitC.data.datasets[1].data.shift();vitC.data.datasets[1].data.push(ri(78,10));vitC.update('none');}
+    if(angC){[r(142,20),r(138,18),r(5.2,3.5),r(98,14)].forEach((v,i)=>{angC.data.datasets[i].data.shift();angC.data.datasets[i].data.push(v);});angC.update('none');}
+    (['t','l','u','r']).forEach((p,i)=>{const base=[36.8,28.3,37.2,36.4][i],amp=[.5,.7,.6,.4][i];const el=$(`${p}-temp`);if(el)el.textContent=(base+(Math.random()-.5)*amp).toFixed(1);});
+  },3000);
+}
+
+// ══════════════════════════════════════════
+//  TIMERS
+// ══════════════════════════════════════════
+function startTimers(){
+  setInterval(()=>{sessSec++;const m=String(Math.floor(sessSec/60)).padStart(2,'0'),s=String(sessSec%60).padStart(2,'0');const el=document.getElementById('sess-t');if(el)el.textContent=m+':'+s;},1000);
+  setInterval(()=>{if(!playing)return;vidSec++;const h=String(Math.floor(vidSec/3600)).padStart(2,'0'),m=String(Math.floor((vidSec%3600)/60)).padStart(2,'0'),s=String(vidSec%60).padStart(2,'0');const el=document.getElementById('tcDisp');if(el)el.textContent=`${h}:${m}:${s}`;},1000);
+  let ts=18*60+42,ls=5*60+20,us=8*60+15,rs=10*60,tot=32*60+17;
+  const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+  setInterval(()=>{ts++;ls++;us++;rs++;tot++;const $=id=>document.getElementById(id);if($('t-time'))$('t-time').textContent=fmt(ts);if($('l-time'))$('l-time').textContent=fmt(ls);if($('u-time'))$('u-time').textContent=fmt(us);if($('r-time'))$('r-time').textContent=fmt(rs);if($('kpi-time'))$('kpi-time').textContent=fmt(tot);},1000);
+}
+</script>
+</body>
+</html>
