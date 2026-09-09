@@ -11,7 +11,7 @@ INTENSIDADE_MIN = 0.5
 INTENSIDADE_MAX = 2.5
 FREQUENCIAS_POSSIVEIS = [1, 3]
 
-def gerar_leitura():
+def gerar_leitura(sessao_id=None):
     intensidade = round(random.uniform(INTENSIDADE_MIN, INTENSIDADE_MAX), 2)
     frequencia = random.choice(FREQUENCIAS_POSSIVEIS)
     agora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -21,7 +21,8 @@ def gerar_leitura():
         sensor_tipo="ultrassom",
         valor=intensidade,
         unidade="W/cm2",
-        timestamp=agora
+        timestamp=agora,
+        sessao_id=sessao_id
     )
     return leitura, frequencia
 

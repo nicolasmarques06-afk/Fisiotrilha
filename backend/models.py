@@ -1,10 +1,11 @@
 ﻿class LeituraSensorIoT:
-    def __init__(self, id, sensor_tipo, valor, unidade, timestamp):
+    def __init__(self, id, sensor_tipo, valor, unidade, timestamp, sessao_id=None):
         self.id = id
         self.sensor_tipo = sensor_tipo
         self.valor = valor
         self.unidade = unidade
         self.timestamp = timestamp
+        self.sessao_id = sessao_id
 
 class AnaliseVisaoComputacional:
     def __init__(self, id, sessao, angulo_articular, articulacao, confianca, momento):
@@ -33,8 +34,8 @@ class Predicao:
         self.fatores_contribuintes = fatores_contribuintes
 
 if __name__ == "__main__":
-    leitura = LeituraSensorIoT("001", "laser", 25.5, "mW/cm2", "2026-08-31 10:00")
-    print(leitura.sensor_tipo, leitura.valor, leitura.unidade)
+    leitura = LeituraSensorIoT("001", "laser", 25.5, "mW/cm2", "2026-08-31 10:00", sessao_id="sessao-01")
+    print(leitura.sensor_tipo, leitura.valor, leitura.unidade, leitura.sessao_id)
     analise = AnaliseVisaoComputacional("001", "sessao-01", 92.3, "joelho", 0.87, "antes")
     print(analise.articulacao, analise.angulo_articular, analise.confianca, analise.momento)
     sessao = SessaoTerapia("sessao-01", "hist-01", "2026-08-31 10:00", 30, "agachamento")
