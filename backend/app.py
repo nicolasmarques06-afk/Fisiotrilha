@@ -3,7 +3,7 @@ import os
 import time
 import random
 from datetime import datetime
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
@@ -12,6 +12,24 @@ from iot.simulador_sensor import gerar_leitura
 
 app = Flask(__name__)
 CORS(app)
+
+USUARIOS_VALIDOS = {
+    "dr.silva@hospital.org": {"senha": "12345678", "nome": "Dr. Silva"}
+}
+
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    dados = request.get_json()
+    email = dados.get("email", "")
+    senha = dados.get("senha", "")
+
+    usuario = USUARIOS_VALIDOS.get(email)
+
+    if usuario and usuario["senha"] == senha:
+        return jsonify({"sucesso": True, "nome": usuario["nome"]})
+    else:
+        return jsonify({"sucesso": False}), 401
 
 
 @app.route("/api/equipamento/ultrassom")
