@@ -6,7 +6,7 @@ from datetime import datetime
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from backend.models import SessaoTerapia, AnaliseVisaoComputacional
 from visao_computacional.processar_video import processar_video
-from iot.simulador_sensor import gerar_leitura
+from iot.simulador_sensor import gerar_leitura_emg, gerar_leitura_forca, gerar_leitura_imu
 
 VIDEO_ANTES = "videos/antes.mp4"
 VIDEO_DEPOIS = "videos/depois.mp4"
@@ -51,7 +51,9 @@ if __name__ == "__main__":
         momento="depois"
     )
 
-    leitura_sensor, frequencia = gerar_leitura(sessao_id=sessao.id)
+    emg = gerar_leitura_emg(sessao_id=sessao.id)
+    forca = gerar_leitura_forca(sessao_id=sessao.id)
+    imu = gerar_leitura_imu(sessao_id=sessao.id)
 
     print("")
     print("=== PRONTUARIO DA SESSAO ===")
@@ -63,6 +65,8 @@ if __name__ == "__main__":
     diferenca = analise_depois.angulo_articular - analise_antes.angulo_articular
     print(f"Diferenca: {diferenca:+.1f} graus")
     print("")
-    print("-- Equipamento utilizado durante a sessao (informativo, nao entra no calculo de risco) --")
-    print(f"Ultrassom | Intensidade: {leitura_sensor.valor} {leitura_sensor.unidade} | Frequencia: {frequencia} MHz")
-    print(f"(Leitura vinculada a sessao: {leitura_sensor.sessao_id})")
+    print("-- Sensores monitorados durante a sessao (usados no calculo de risco) --")
+    print(f"EMG: {emg.valor} {emg.unidade}")
+    print(f"Plataforma de forca: {forca.valor} {forca.unidade}")
+    print(f"IMU: {imu.valor} {imu.unidade}")
+

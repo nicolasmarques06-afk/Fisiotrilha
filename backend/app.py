@@ -2,13 +2,15 @@
 import os
 import time
 import random
+import tempfile
 from datetime import datetime
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from backend.models import SessaoTerapia, AnaliseVisaoComputacional
-from iot.simulador_sensor import gerar_leitura
+from iot.simulador_sensor import gerar_leitura_emg, gerar_leitura_forca, gerar_leitura_imu
+from backend.gerar_laudo import gerar_laudo_pdf
 
 app = Flask(__name__)
 CORS(app)
@@ -32,16 +34,46 @@ def login():
         return jsonify({"sucesso": False}), 401
 
 
-@app.route("/api/equipamento/ultrassom")
-def equipamento_ultrassom():
-    leitura, frequencia = gerar_leitura()
-    resposta = {
-        "intensidade": leitura.valor,
+@app.route("/api/equipamento/emg")
+def equipamento_emg():
+    leitura = gerar_leitura_emg()
+    return jsonify({
+        "valor": leitura.valor,
         "unidade": leitura.unidade,
-        "frequencia_mhz": frequencia,
         "timestamp": leitura.timestamp
-    }
-    return jsonify(resposta)
+    })
+
+
+@app.route("/api/equipamento/forca")
+def equipamento_forca():
+    leitura = gerar_leitura_forca()
+    return jsonify({
+        "valor": leitura.valor,
+        "unidade": leitura.unidade,
+        "timestamp": leitura.timestamp
+    })
+
+
+@app.route("/api/equipamento/imu")
+def equipamento_imu():
+    leitura = gerar_leitura_imu()
+    return jsonify({
+        "valor": leitura.valor,
+        "unidade": leitura.unidade,
+        "timestamp": leitura.timestamp
+    })
+
+
+@app.route("/api/laudo")
+def laudo():
+    caminho_temp = os.path.join(tempfile.gettempdir(), "laudo_fisiotrilha.pdf")
+    gerar_laudo_pdf(caminho_temp, paciente_nome="Maria Ferreira", paciente_nascimento="14/03/1985")
+    return send_file(
+        caminho_temp,
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name="laudo_fisiotrilha.pdf"
+    )
 
 
 @app.route("/api/sessao-demo")
@@ -75,7 +107,9 @@ def sessao_demo():
         momento="depois"
     )
 
-    leitura_sensor, frequencia = gerar_leitura(sessao_id=sessao.id)
+    emg = gerar_leitura_emg(sessao_id=sessao.id)
+    forca = gerar_leitura_forca(sessao_id=sessao.id)
+    imu = gerar_leitura_imu(sessao_id=sessao.id)
 
     resposta = {
         "sessao": {
@@ -88,11 +122,10 @@ def sessao_demo():
             "angulo_depois": analise_depois.angulo_articular,
             "diferenca": round(analise_depois.angulo_articular - analise_antes.angulo_articular, 1)
         },
-        "equipamento": {
-            "tipo": leitura_sensor.sensor_tipo,
-            "intensidade": leitura_sensor.valor,
-            "unidade": leitura_sensor.unidade,
-            "frequencia_mhz": frequencia
+        "equipamentos": {
+            "emg": {"valor": emg.valor, "unidade": emg.unidade},
+            "plataforma_forca": {"valor": forca.valor, "unidade": forca.unidade},
+            "imu": {"valor": imu.valor, "unidade": imu.unidade}
         }
     }
 

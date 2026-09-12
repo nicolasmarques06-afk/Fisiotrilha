@@ -6,7 +6,8 @@ from datetime import datetime
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from backend.models import SessaoTerapia, AnaliseVisaoComputacional, Predicao
-from iot.simulador_sensor import gerar_leitura
+from iot.simulador_sensor import gerar_leitura_emg, gerar_leitura_forca, gerar_leitura_imu
+from ia.prever import prever_risco
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
@@ -40,21 +41,35 @@ def montar_dados_demo():
         angulo_articular=angulo_depois, articulacao="Joelho", confianca=1.0, momento="depois"
     )
 
-    leitura_sensor, frequencia = gerar_leitura(sessao_id=sessao.id)
+    emg = gerar_leitura_emg(sessao_id=sessao.id)
+    forca = gerar_leitura_forca(sessao_id=sessao.id)
+    imu = gerar_leitura_imu(sessao_id=sessao.id)
+
+    amplitude_movimento = round(angulo_antes - angulo_depois, 1)
+    nivel_dor = random.randint(0, 9)
+
+    resultado_previsao = prever_risco(
+        angulo_joelho=angulo_depois,
+        amplitude_movimento=amplitude_movimento,
+        nivel_dor=nivel_dor,
+        emg=emg.valor,
+        forca_perna_direita=forca.valor,
+        imu=imu.valor
+    )
 
     predicao = Predicao(
         id=f"pred-{int(time.time())}", sessao_id=sessao.id,
-        classificacao_risco="Baixo risco",
-        probabilidade=0.87,
-        margem_erro=0.05,
-        fatores_contribuintes="Amplitude de movimento dentro do padrao esperado para o exercicio."
+        classificacao_risco=resultado_previsao["classificacao_risco"],
+        probabilidade=resultado_previsao["probabilidade"],
+        margem_erro=resultado_previsao["margem_erro"],
+        fatores_contribuintes=resultado_previsao["fatores_contribuintes"]
     )
 
-    return sessao, analise_antes, analise_depois, leitura_sensor, frequencia, predicao
+    return sessao, analise_antes, analise_depois, emg, forca, imu, predicao, nivel_dor, amplitude_movimento
 
 
 def gerar_laudo_pdf(caminho_saida, paciente_nome="(nome do paciente)", paciente_nascimento="(data de nascimento)"):
-    sessao, analise_antes, analise_depois, leitura_sensor, frequencia, predicao = montar_dados_demo()
+    sessao, analise_antes, analise_depois, emg, forca, imu, predicao, nivel_dor, amplitude_movimento = montar_dados_demo()
     diferenca = analise_depois.angulo_articular - analise_antes.angulo_articular
 
     doc = SimpleDocTemplate(
@@ -94,7 +109,8 @@ def gerar_laudo_pdf(caminho_saida, paciente_nome="(nome do paciente)", paciente_
     story.append(Paragraph("2. Dados da Sessao", secao))
     story.append(Paragraph(
         f"Exercicio realizado: <b>{sessao.tipo_exercicio}</b> &nbsp;&nbsp;|&nbsp;&nbsp; "
-        f"Duracao prevista: <b>{sessao.duracao_min} min</b>", corpo))
+        f"Duracao prevista: <b>{sessao.duracao_min} min</b> &nbsp;&nbsp;|&nbsp;&nbsp; "
+        f"Nivel de dor relatado (EVA): <b>{nivel_dor}/10</b>", corpo))
 
     story.append(Paragraph("3. Analise de Movimento (Visao Computacional)", secao))
     dados_mov = [
@@ -102,6 +118,7 @@ def gerar_laudo_pdf(caminho_saida, paciente_nome="(nome do paciente)", paciente_
         ["Antes da aplicacao", f"{analise_antes.angulo_articular:.1f} graus"],
         ["Depois da aplicacao", f"{analise_depois.angulo_articular:.1f} graus"],
         ["Diferenca", f"{diferenca:+.1f} graus"],
+        ["Amplitude de movimento", f"{amplitude_movimento:.1f} graus"],
     ]
     t2 = Table(dados_mov, colWidths=[7*cm, 7*cm])
     t2.setStyle(TableStyle([
@@ -121,19 +138,33 @@ def gerar_laudo_pdf(caminho_saida, paciente_nome="(nome do paciente)", paciente_
     story.append(Spacer(1, 6))
     story.append(Paragraph(f"<b>Interpretacao:</b> {interpretacao}", corpo))
 
-    story.append(Paragraph("4. Equipamento Utilizado na Sessao", secao))
+    story.append(Paragraph("4. Sensores Monitorados Durante a Sessao", secao))
+    dados_sensores = [
+        ["Sensor", "Leitura"],
+        ["EMG (ativacao muscular)", f"{emg.valor} {emg.unidade}"],
+        ["Plataforma de forca (distribuicao de peso)", f"{forca.valor} {forca.unidade}"],
+        ["IMU (estabilidade do movimento)", f"{imu.valor} {imu.unidade}"],
+    ]
+    t3s = Table(dados_sensores, colWidths=[8*cm, 6*cm])
+    t3s.setStyle(TableStyle([
+        ("BACKGROUND", (0,0), (-1,0), AZUL),
+        ("TEXTCOLOR", (0,0), (-1,0), colors.white),
+        ("FONTNAME", (0,0), (-1,0), "Helvetica-Bold"),
+        ("FONTSIZE", (0,0), (-1,-1), 9),
+        ("ROWBACKGROUNDS", (0,1), (-1,-1), [colors.white, CINZA_CLARO]),
+        ("GRID", (0,0), (-1,-1), 0.5, colors.HexColor("#DDDDDD")),
+        ("BOTTOMPADDING", (0,0), (-1,-1), 6),
+        ("TOPPADDING", (0,0), (-1,-1), 6),
+    ]))
+    story.append(t3s)
     story.append(Paragraph(
-        f"Equipamento: <b>{leitura_sensor.sensor_tipo.capitalize()}</b> &nbsp;&nbsp;|&nbsp;&nbsp; "
-        f"Intensidade: <b>{leitura_sensor.valor} {leitura_sensor.unidade}</b> &nbsp;&nbsp;|&nbsp;&nbsp; "
-        f"Frequencia: <b>{frequencia} MHz</b>", corpo))
-    story.append(Paragraph(
-        "<i>Nota: este dado e informativo, registrando o uso do equipamento durante a sessao, "
-        "e nao influencia diretamente a classificacao de risco abaixo.</i>",
+        "<i>Nota: estes dados, junto com a analise de movimento e o nivel de dor relatado, "
+        "alimentam a classificacao de risco apresentada a seguir.</i>",
         ParagraphStyle("nota", parent=corpo, fontSize=8, textColor=colors.grey)))
 
     story.append(Paragraph("5. Avaliacao de Apoio a Decisao (Inteligencia Artificial)", secao))
     dados_ia = [
-        ["Classificacao", predicao.classificacao_risco],
+        ["Classificacao", predicao.classificacao_risco.capitalize()],
         ["Probabilidade", f"{predicao.probabilidade*100:.0f}%"],
         ["Margem de erro", f"+/- {predicao.margem_erro*100:.0f}%"],
         ["Fatores considerados", predicao.fatores_contribuintes],
@@ -151,8 +182,8 @@ def gerar_laudo_pdf(caminho_saida, paciente_nome="(nome do paciente)", paciente_
     story.append(t3)
     story.append(Spacer(1, 4))
     story.append(Paragraph(
-        "<i>Esta avaliacao e um apoio a decisao clinica gerado por modelo de aprendizado de maquina "
-        "e nao substitui o julgamento profissional do fisioterapeuta responsavel.</i>",
+        "<i>Esta avaliacao e um apoio a decisao clinica gerado por modelo de aprendizado de maquina, "
+        "treinado com dados sinteticos, e nao substitui o julgamento profissional do fisioterapeuta responsavel.</i>",
         ParagraphStyle("nota2", parent=corpo, fontSize=8, textColor=colors.grey)))
 
     story.append(Paragraph("6. Observacoes do Fisioterapeuta Responsavel", secao))
