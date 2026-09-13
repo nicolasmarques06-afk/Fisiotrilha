@@ -11,6 +11,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from backend.models import SessaoTerapia, AnaliseVisaoComputacional
 from iot.simulador_sensor import gerar_leitura_emg, gerar_leitura_forca, gerar_leitura_imu
 from backend.gerar_laudo import gerar_laudo_pdf
+from ia.prever import prever_risco
 
 app = Flask(__name__)
 CORS(app)
@@ -88,6 +89,8 @@ def sessao_demo():
 
     angulo_antes = round(random.uniform(150, 175), 1)
     angulo_depois = round(random.uniform(80, 100), 1)
+    amplitude_movimento = round(angulo_antes - angulo_depois, 1)
+    nivel_dor = random.randint(0, 9)
 
     analise_antes = AnaliseVisaoComputacional(
         id=f"analise-{int(time.time())}-antes",
@@ -111,6 +114,15 @@ def sessao_demo():
     forca = gerar_leitura_forca(sessao_id=sessao.id)
     imu = gerar_leitura_imu(sessao_id=sessao.id)
 
+    predicao = prever_risco(
+        angulo_joelho=angulo_depois,
+        amplitude_movimento=amplitude_movimento,
+        nivel_dor=nivel_dor,
+        emg=emg.valor,
+        forca_perna_direita=forca.valor,
+        imu=imu.valor
+    )
+
     resposta = {
         "sessao": {
             "id": sessao.id,
@@ -120,12 +132,20 @@ def sessao_demo():
         "analise_movimento": {
             "angulo_antes": analise_antes.angulo_articular,
             "angulo_depois": analise_depois.angulo_articular,
-            "diferenca": round(analise_depois.angulo_articular - analise_antes.angulo_articular, 1)
+            "diferenca": round(analise_depois.angulo_articular - analise_antes.angulo_articular, 1),
+            "amplitude_movimento": amplitude_movimento,
+            "nivel_dor": nivel_dor
         },
         "equipamentos": {
             "emg": {"valor": emg.valor, "unidade": emg.unidade},
             "plataforma_forca": {"valor": forca.valor, "unidade": forca.unidade},
             "imu": {"valor": imu.valor, "unidade": imu.unidade}
+        },
+        "predicao_ia": {
+            "classificacao_risco": predicao["classificacao_risco"],
+            "probabilidade": predicao["probabilidade"],
+            "margem_erro": predicao["margem_erro"],
+            "fatores_contribuintes": predicao["fatores_contribuintes"]
         }
     }
 
