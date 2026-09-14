@@ -1,0 +1,9 @@
+﻿flask
+flask-cors
+mediapipe
+opencv-contrib-python
+reportlab
+pandas
+scikit-learn
+joblib
+openpyxl
