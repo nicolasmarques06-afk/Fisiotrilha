@@ -206,5 +206,40 @@ def sessao():
         return jsonify({"erro": f"Nao foi possivel registrar a sessao: {erro}"}), 500
 
 
+
+@app.route("/api/status")
+def status():
+    resultado = {
+        "servidor": "ok",
+        "verificado_em": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "componentes": {}
+    }
+
+    for nome, funcao in [("emg", gerar_leitura_emg), ("plataforma_forca", gerar_leitura_forca), ("imu", gerar_leitura_imu)]:
+        try:
+            funcao()
+            resultado["componentes"][nome] = "ok"
+        except Exception as erro:
+            resultado["componentes"][nome] = f"erro: {erro}"
+
+    try:
+        prever_risco(angulo_joelho=100, amplitude_movimento=60, nivel_dor=5, emg=50, forca_perna_direita=50, imu=15)
+        resultado["componentes"]["modelo_ia"] = "ok"
+    except Exception as erro:
+        resultado["componentes"]["modelo_ia"] = f"erro: {erro}"
+
+    try:
+        caminho_teste = os.path.join(tempfile.gettempdir(), "teste_status.pdf")
+        gerar_laudo_pdf(caminho_teste, paciente_nome="Teste", paciente_nascimento="01/01/2000")
+        resultado["componentes"]["geracao_laudo"] = "ok"
+    except Exception as erro:
+        resultado["componentes"]["geracao_laudo"] = f"erro: {erro}"
+
+    tudo_ok = all(v == "ok" for v in resultado["componentes"].values())
+    resultado["status_geral"] = "tudo funcionando" if tudo_ok else "atencao: algum componente com problema"
+
+    return jsonify(resultado)
+
 if __name__ == "__main__":
     app.run(debug=True)
+
