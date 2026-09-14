@@ -20,7 +20,15 @@ _modelo = None
 def _carregar_modelo():
     global _modelo
     if _modelo is None:
-        _modelo = joblib.load(CAMINHO_MODELO)
+        if not os.path.exists(CAMINHO_MODELO):
+            raise RuntimeError(
+                "Modelo de IA nao encontrado. Rode 'python ia/treinar_modelo.py' "
+                "para gerar o arquivo modelo_risco.joblib antes de usar a previsao."
+            )
+        try:
+            _modelo = joblib.load(CAMINHO_MODELO)
+        except Exception as erro:
+            raise RuntimeError(f"Nao foi possivel carregar o modelo de IA: {erro}")
     return _modelo
 
 def prever_risco(angulo_joelho, amplitude_movimento, nivel_dor, emg, forca_perna_direita, imu):

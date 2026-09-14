@@ -23,133 +23,162 @@ USUARIOS_VALIDOS = {
 
 @app.route("/api/login", methods=["POST"])
 def login():
-    dados = request.get_json()
-    email = dados.get("email", "")
-    senha = dados.get("senha", "")
+    try:
+        dados = request.get_json(silent=True)
+        if not dados:
+            return jsonify({"sucesso": False, "erro": "Dados de login ausentes ou mal formatados."}), 400
 
-    usuario = USUARIOS_VALIDOS.get(email)
+        email = dados.get("email", "")
+        senha = dados.get("senha", "")
 
-    if usuario and usuario["senha"] == senha:
-        return jsonify({"sucesso": True, "nome": usuario["nome"]})
-    else:
-        return jsonify({"sucesso": False}), 401
+        usuario = USUARIOS_VALIDOS.get(email)
+
+        if usuario and usuario["senha"] == senha:
+            return jsonify({"sucesso": True, "nome": usuario["nome"]})
+        else:
+            return jsonify({"sucesso": False}), 401
+    except Exception as erro:
+        return jsonify({"sucesso": False, "erro": f"Erro interno no login: {erro}"}), 500
 
 
 @app.route("/api/equipamento/emg")
 def equipamento_emg():
-    leitura = gerar_leitura_emg()
-    return jsonify({
-        "valor": leitura.valor,
-        "unidade": leitura.unidade,
-        "timestamp": leitura.timestamp
-    })
+    try:
+        leitura = gerar_leitura_emg()
+        return jsonify({
+            "valor": leitura.valor,
+            "unidade": leitura.unidade,
+            "timestamp": leitura.timestamp
+        })
+    except Exception as erro:
+        return jsonify({"erro": f"Nao foi possivel gerar leitura de EMG: {erro}"}), 500
 
 
 @app.route("/api/equipamento/forca")
 def equipamento_forca():
-    leitura = gerar_leitura_forca()
-    return jsonify({
-        "valor": leitura.valor,
-        "unidade": leitura.unidade,
-        "timestamp": leitura.timestamp
-    })
+    try:
+        leitura = gerar_leitura_forca()
+        return jsonify({
+            "valor": leitura.valor,
+            "unidade": leitura.unidade,
+            "timestamp": leitura.timestamp
+        })
+    except Exception as erro:
+        return jsonify({"erro": f"Nao foi possivel gerar leitura da plataforma de forca: {erro}"}), 500
 
 
 @app.route("/api/equipamento/imu")
 def equipamento_imu():
-    leitura = gerar_leitura_imu()
-    return jsonify({
-        "valor": leitura.valor,
-        "unidade": leitura.unidade,
-        "timestamp": leitura.timestamp
-    })
+    try:
+        leitura = gerar_leitura_imu()
+        return jsonify({
+            "valor": leitura.valor,
+            "unidade": leitura.unidade,
+            "timestamp": leitura.timestamp
+        })
+    except Exception as erro:
+        return jsonify({"erro": f"Nao foi possivel gerar leitura do IMU: {erro}"}), 500
 
 
 @app.route("/api/laudo")
 def laudo():
-    caminho_temp = os.path.join(tempfile.gettempdir(), "laudo_fisiotrilha.pdf")
-    gerar_laudo_pdf(caminho_temp, paciente_nome="Maria Ferreira", paciente_nascimento="14/03/1985")
-    return send_file(
-        caminho_temp,
-        mimetype="application/pdf",
-        as_attachment=False,
-        download_name="laudo_fisiotrilha.pdf"
-    )
+    try:
+        caminho_temp = os.path.join(tempfile.gettempdir(), "laudo_fisiotrilha.pdf")
+        gerar_laudo_pdf(caminho_temp, paciente_nome="Maria Ferreira", paciente_nascimento="14/03/1985")
+        return send_file(
+            caminho_temp,
+            mimetype="application/pdf",
+            as_attachment=False,
+            download_name="laudo_fisiotrilha.pdf"
+        )
+    except Exception as erro:
+        return jsonify({"erro": f"Nao foi possivel gerar o laudo: {erro}"}), 500
 
 
 @app.route("/api/sessao-demo")
 def sessao_demo():
-    sessao = SessaoTerapia(
-        id=f"sessao-{int(time.time())}",
-        historico_id="hist-demo",
-        data_hora=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        duracao_min=30,
-        tipo_exercicio="agachamento"
-    )
+    try:
+        sessao = SessaoTerapia(
+            id=f"sessao-{int(time.time())}",
+            historico_id="hist-demo",
+            data_hora=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            duracao_min=30,
+            tipo_exercicio="agachamento"
+        )
 
-    angulo_antes = round(random.uniform(150, 175), 1)
-    angulo_depois = round(random.uniform(80, 100), 1)
-    amplitude_movimento = round(angulo_antes - angulo_depois, 1)
-    nivel_dor = random.randint(0, 9)
+        angulo_antes = round(random.uniform(150, 175), 1)
+        angulo_depois = round(random.uniform(80, 100), 1)
+        amplitude_movimento = round(angulo_antes - angulo_depois, 1)
+        nivel_dor = random.randint(0, 9)
 
-    analise_antes = AnaliseVisaoComputacional(
-        id=f"analise-{int(time.time())}-antes",
-        sessao=sessao.id,
-        angulo_articular=angulo_antes,
-        articulacao="joelho",
-        confianca=1.0,
-        momento="antes"
-    )
+        analise_antes = AnaliseVisaoComputacional(
+            id=f"analise-{int(time.time())}-antes",
+            sessao=sessao.id,
+            angulo_articular=angulo_antes,
+            articulacao="joelho",
+            confianca=1.0,
+            momento="antes"
+        )
 
-    analise_depois = AnaliseVisaoComputacional(
-        id=f"analise-{int(time.time())}-depois",
-        sessao=sessao.id,
-        angulo_articular=angulo_depois,
-        articulacao="joelho",
-        confianca=1.0,
-        momento="depois"
-    )
+        analise_depois = AnaliseVisaoComputacional(
+            id=f"analise-{int(time.time())}-depois",
+            sessao=sessao.id,
+            angulo_articular=angulo_depois,
+            articulacao="joelho",
+            confianca=1.0,
+            momento="depois"
+        )
 
-    emg = gerar_leitura_emg(sessao_id=sessao.id)
-    forca = gerar_leitura_forca(sessao_id=sessao.id)
-    imu = gerar_leitura_imu(sessao_id=sessao.id)
+        emg = gerar_leitura_emg(sessao_id=sessao.id)
+        forca = gerar_leitura_forca(sessao_id=sessao.id)
+        imu = gerar_leitura_imu(sessao_id=sessao.id)
 
-    predicao = prever_risco(
-        angulo_joelho=angulo_depois,
-        amplitude_movimento=amplitude_movimento,
-        nivel_dor=nivel_dor,
-        emg=emg.valor,
-        forca_perna_direita=forca.valor,
-        imu=imu.valor
-    )
+        try:
+            predicao = prever_risco(
+                angulo_joelho=angulo_depois,
+                amplitude_movimento=amplitude_movimento,
+                nivel_dor=nivel_dor,
+                emg=emg.valor,
+                forca_perna_direita=forca.valor,
+                imu=imu.valor
+            )
+        except RuntimeError as erro_modelo:
+            predicao = {
+                "classificacao_risco": "indisponivel",
+                "probabilidade": 0.0,
+                "margem_erro": 1.0,
+                "fatores_contribuintes": str(erro_modelo)
+            }
 
-    resposta = {
-        "sessao": {
-            "id": sessao.id,
-            "tipo_exercicio": sessao.tipo_exercicio,
-            "duracao_min": sessao.duracao_min
-        },
-        "analise_movimento": {
-            "angulo_antes": analise_antes.angulo_articular,
-            "angulo_depois": analise_depois.angulo_articular,
-            "diferenca": round(analise_depois.angulo_articular - analise_antes.angulo_articular, 1),
-            "amplitude_movimento": amplitude_movimento,
-            "nivel_dor": nivel_dor
-        },
-        "equipamentos": {
-            "emg": {"valor": emg.valor, "unidade": emg.unidade},
-            "plataforma_forca": {"valor": forca.valor, "unidade": forca.unidade},
-            "imu": {"valor": imu.valor, "unidade": imu.unidade}
-        },
-        "predicao_ia": {
-            "classificacao_risco": predicao["classificacao_risco"],
-            "probabilidade": predicao["probabilidade"],
-            "margem_erro": predicao["margem_erro"],
-            "fatores_contribuintes": predicao["fatores_contribuintes"]
+        resposta = {
+            "sessao": {
+                "id": sessao.id,
+                "tipo_exercicio": sessao.tipo_exercicio,
+                "duracao_min": sessao.duracao_min
+            },
+            "analise_movimento": {
+                "angulo_antes": analise_antes.angulo_articular,
+                "angulo_depois": analise_depois.angulo_articular,
+                "diferenca": round(analise_depois.angulo_articular - analise_antes.angulo_articular, 1),
+                "amplitude_movimento": amplitude_movimento,
+                "nivel_dor": nivel_dor
+            },
+            "equipamentos": {
+                "emg": {"valor": emg.valor, "unidade": emg.unidade},
+                "plataforma_forca": {"valor": forca.valor, "unidade": forca.unidade},
+                "imu": {"valor": imu.valor, "unidade": imu.unidade}
+            },
+            "predicao_ia": {
+                "classificacao_risco": predicao["classificacao_risco"],
+                "probabilidade": predicao["probabilidade"],
+                "margem_erro": predicao["margem_erro"],
+                "fatores_contribuintes": predicao["fatores_contribuintes"]
+            }
         }
-    }
 
-    return jsonify(resposta)
+        return jsonify(resposta)
+    except Exception as erro:
+        return jsonify({"erro": f"Nao foi possivel gerar a sessao de demonstracao: {erro}"}), 500
 
 
 if __name__ == "__main__":
