@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -421,8 +421,8 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:.62rem 1
         <div><div class="lc-name">Fisio<em>trilha</em></div><div class="lc-tag">monitoramento que transforma resultados</div></div>
       </div>
       <div class="lc-h">Acesso Seguro · OITFC Sistema Clínico v3</div>
-      <div class="fld"><label>Usuário / CRM</label><input type="text" value="dr.silva@hospital.org"></div>
-      <div class="fld"><label>Senha</label><input type="password" value="12345678"></div>
+      <div class="fld"><label>Usuário / CRM</label><input type="text" id="login-user" value="dr.silva@hospital.org"></div>
+      <div class="fld"><label>Senha</label><input type="password" id="login-pass" value="12345678"></div>
       <div class="fld mono"><label>Token MFA (RF10)</label><input type="text" value="A3F7-9B21-CC45-8E02"></div>
       <div class="lgpd-note">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#3A92FF" stroke-width="2.5" style="flex-shrink:0;margin-top:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -765,7 +765,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:.62rem 1
         <div style="font-size:.88rem;font-weight:700;color:var(--t1)">Orquestração Inteligente de Terapias Fisioterapêuticas Conectadas</div>
         <div style="font-size:.62rem;color:var(--t3);font-family:var(--mono);margin-top:3px">Paciente: Maria Ferreira · Sessão #12 · LBP-Advanced v2 · 4 dispositivos</div>
       </div>
-      <span class="chip ch-g" style="font-size:.6rem;padding:4px 10px">● Todos Online</span>
+      <span class="chip ch-g" style="font-size:.6rem;padding:4px 10px">● 3 Sensores Online</span>
     </div>
     <div class="oitfc-kpis">
       <div class="kpi"><div class="kpi-lbl">Tempo Sessão</div><div class="kpi-val b" id="kpi-time">32:17</div><div class="kpi-sub">de 45 min prescritos</div></div>
@@ -773,46 +773,56 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:.62rem 1
       <div class="kpi"><div class="kpi-lbl">Ajustes IA</div><div class="kpi-val b" id="kpi-adj">0</div><div class="kpi-sub">nesta sessão</div></div>
       <div class="kpi"><div class="kpi-lbl">LGPD Compliance</div><div class="kpi-val g">100%</div><div class="kpi-sub">RNF01 · Anonimizado</div></div>
     </div>
+    <div class="card" style="margin-bottom:.9rem">
+      <div class="card-hd"><div class="card-title"><span class="ctd g"></span>Sensores Conectados — Leitura em Tempo Real</div><span class="chip ch-g">Sync 3s</span></div>
+      <div class="card-bd">
+        <div class="sensor-grid">
+          <div class="sc"><div class="sc-lbl">EMG</div><div class="sc-val" id="emg-val">—</div><div class="sc-unit">% ativação</div></div>
+          <div class="sc"><div class="sc-lbl">Força</div><div class="sc-val" id="forca-val">—</div><div class="sc-unit">% perna direita</div></div>
+          <div class="sc"><div class="sc-lbl">IMU</div><div class="sc-val" id="imu-val">—</div><div class="sc-unit">°/s (oscilação)</div></div>
+        </div>
+      </div>
+    </div>
     <div class="equip-grid">
-      <div class="equip-card">
-        <div class="eq-hd"><div class="eq-icon ei-b">⚡</div><div><div class="eq-name">Eletroestimulador TENS/FES</div><div class="eq-model">PhysioStim Pro 3000 · CH1–CH4</div></div><div class="eq-status"><div style="width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite"></div>ATIVO</div></div>
+      <div class="equip-card" style="filter:grayscale(1);opacity:.5">
+        <div class="eq-hd"><div class="eq-icon ei-b">⚡</div><div><div class="eq-name">Eletroestimulador TENS/FES</div><div class="eq-model">PhysioStim Pro 3000 · CH1–CH4</div></div><div class="eq-status" style="color:var(--t3)"><div style="width:5px;height:5px;border-radius:50%;background:var(--t3)"></div>INDISPONÍVEL</div></div>
         <div class="param-grid">
-          <div class="pb"><div class="pb-lbl">Intensidade Corrente</div><div class="pb-val" id="t-int">28</div><div class="pb-unit">mA</div></div>
-          <div class="pb"><div class="pb-lbl">Frequência</div><div class="pb-val" id="t-freq">80</div><div class="pb-unit">Hz</div></div>
+          <div class="pb"><div class="pb-lbl">Intensidade Corrente</div><div class="pb-val" id="t-int">—</div><div class="pb-unit">mA</div></div>
+          <div class="pb"><div class="pb-lbl">Frequência</div><div class="pb-val" id="t-freq">—</div><div class="pb-unit">Hz</div></div>
           <div class="pb"><div class="pb-lbl">Tempo de Uso</div><div class="pb-val" id="t-time">18:42</div><div class="pb-unit">min:seg</div></div>
-          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="t-temp">36.8</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:52%"></div></div></div>
+          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="t-temp">—</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:0%"></div></div></div>
         </div>
-        <div class="eq-footer"><div class="eq-spec">Onda bifásica simétrica · Pulso: 250µs · Rampa: 2s↑/2s↓</div><button class="btn-ai-adj" onclick="aiAdjust('tens')"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
+        <div class="eq-footer"><div class="eq-spec">Onda bifásica simétrica · Pulso: 250µs · Rampa: 2s↑/2s↓</div><button class="btn-ai-adj" disabled style="pointer-events:none;opacity:.5"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
       </div>
-      <div class="equip-card">
-        <div class="eq-hd"><div class="eq-icon ei-c">🔴</div><div><div class="eq-name">Laser Terapêutico</div><div class="eq-model">LaserMed Twin 830nm · L4–L5</div></div><div class="eq-status"><div style="width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite"></div>ATIVO</div></div>
+      <div class="equip-card" style="filter:grayscale(1);opacity:.5">
+        <div class="eq-hd"><div class="eq-icon ei-c">🔴</div><div><div class="eq-name">Laser Terapêutico</div><div class="eq-model">LaserMed Twin 830nm · L4–L5</div></div><div class="eq-status" style="color:var(--t3)"><div style="width:5px;height:5px;border-radius:50%;background:var(--t3)"></div>INDISPONÍVEL</div></div>
         <div class="param-grid">
-          <div class="pb"><div class="pb-lbl">Intensidade</div><div class="pb-val" id="l-int">100</div><div class="pb-unit">mW</div></div>
-          <div class="pb"><div class="pb-lbl">Comprimento de Onda</div><div class="pb-val" id="l-freq">830</div><div class="pb-unit">nm</div></div>
+          <div class="pb"><div class="pb-lbl">Intensidade</div><div class="pb-val" id="l-int">—</div><div class="pb-unit">mW</div></div>
+          <div class="pb"><div class="pb-lbl">Comprimento de Onda</div><div class="pb-val" id="l-freq">—</div><div class="pb-unit">nm</div></div>
           <div class="pb"><div class="pb-lbl">Tempo de Uso</div><div class="pb-val" id="l-time">05:20</div><div class="pb-unit">min:seg</div></div>
-          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="l-temp">28.3</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:28%"></div></div></div>
+          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="l-temp">—</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:0%"></div></div></div>
         </div>
-        <div class="eq-footer"><div class="eq-spec">Dose: 4 J/cm² · Pontual contínuo · 3 pontos · 1cm²</div><button class="btn-ai-adj" onclick="aiAdjust('laser')"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
+        <div class="eq-footer"><div class="eq-spec">Dose: 4 J/cm² · Pontual contínuo · 3 pontos · 1cm²</div><button class="btn-ai-adj" disabled style="pointer-events:none;opacity:.5"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
       </div>
-      <div class="equip-card">
-        <div class="eq-hd"><div class="eq-icon ei-a">〰️</div><div><div class="eq-name">Ultrassom Terapêutico</div><div class="eq-model">SonoMed Plus · 5cm² · Para-espinhal L4</div></div><div class="eq-status"><div style="width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite"></div>ATIVO</div></div>
+      <div class="equip-card" style="filter:grayscale(1);opacity:.5">
+        <div class="eq-hd"><div class="eq-icon ei-a">〰️</div><div><div class="eq-name">Ultrassom Terapêutico</div><div class="eq-model">SonoMed Plus · 5cm² · Para-espinhal L4</div></div><div class="eq-status" style="color:var(--t3)"><div style="width:5px;height:5px;border-radius:50%;background:var(--t3)"></div>INDISPONÍVEL</div></div>
         <div class="param-grid">
-          <div class="pb"><div class="pb-lbl">Intensidade</div><div class="pb-val" id="u-int">1.5</div><div class="pb-unit">W/cm²</div></div>
-          <div class="pb"><div class="pb-lbl">Frequência</div><div class="pb-val" id="u-freq">1</div><div class="pb-unit">MHz</div></div>
+          <div class="pb"><div class="pb-lbl">Intensidade</div><div class="pb-val" id="u-int">—</div><div class="pb-unit">W/cm²</div></div>
+          <div class="pb"><div class="pb-lbl">Frequência</div><div class="pb-val" id="u-freq">—</div><div class="pb-unit">MHz</div></div>
           <div class="pb"><div class="pb-lbl">Tempo de Uso</div><div class="pb-val" id="u-time">08:15</div><div class="pb-unit">min:seg</div></div>
-          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="u-temp">37.2</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:68%"></div></div></div>
+          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="u-temp">—</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:0%"></div></div></div>
         </div>
-        <div class="eq-footer"><div class="eq-spec">Pulsado 20% · SATA: 0.3 W/cm² · SATP: 1.5 W/cm²</div><button class="btn-ai-adj" onclick="aiAdjust('us')"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
+        <div class="eq-footer"><div class="eq-spec">Pulsado 20% · SATA: 0.3 W/cm² · SATP: 1.5 W/cm²</div><button class="btn-ai-adj" disabled style="pointer-events:none;opacity:.5"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
       </div>
-      <div class="equip-card">
-        <div class="eq-hd"><div class="eq-icon ei-g">🌊</div><div><div class="eq-name">Correntes Russas</div><div class="eq-model">NeuroMod Elite · Quadriceps bilateral</div></div><div class="eq-status"><div style="width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s infinite"></div>ATIVO</div></div>
+      <div class="equip-card" style="filter:grayscale(1);opacity:.5">
+        <div class="eq-hd"><div class="eq-icon ei-g">🌊</div><div><div class="eq-name">Correntes Russas</div><div class="eq-model">NeuroMod Elite · Quadriceps bilateral</div></div><div class="eq-status" style="color:var(--t3)"><div style="width:5px;height:5px;border-radius:50%;background:var(--t3)"></div>INDISPONÍVEL</div></div>
         <div class="param-grid">
-          <div class="pb"><div class="pb-lbl">Intensidade Corrente</div><div class="pb-val" id="r-int">35</div><div class="pb-unit">mA</div></div>
-          <div class="pb"><div class="pb-lbl">Frequência</div><div class="pb-val" id="r-freq">2500</div><div class="pb-unit">Hz</div></div>
+          <div class="pb"><div class="pb-lbl">Intensidade Corrente</div><div class="pb-val" id="r-int">—</div><div class="pb-unit">mA</div></div>
+          <div class="pb"><div class="pb-lbl">Frequência</div><div class="pb-val" id="r-freq">—</div><div class="pb-unit">Hz</div></div>
           <div class="pb"><div class="pb-lbl">Tempo de Uso</div><div class="pb-val" id="r-time">10:00</div><div class="pb-unit">min:seg</div></div>
-          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="r-temp">36.4</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:48%"></div></div></div>
+          <div class="pb"><div class="pb-lbl">Temp. Aplicador</div><div class="pb-val" id="r-temp">—</div><div class="pb-unit">°C</div><div class="tb-bar"><div class="tb-fill" style="width:0%"></div></div></div>
         </div>
-        <div class="eq-footer"><div class="eq-spec">Burst: 50Hz · Ciclo: 10s ON/10s OFF · Rampa: 3s</div><button class="btn-ai-adj" onclick="aiAdjust('russas')"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
+        <div class="eq-footer"><div class="eq-spec">Burst: 50Hz · Ciclo: 10s ON/10s OFF · Rampa: 3s</div><button class="btn-ai-adj" disabled style="pointer-events:none;opacity:.5"><span class="ai-pill">IA</span> Sugestão de Ajuste Automático</button></div>
       </div>
     </div>
   </div>
@@ -1385,10 +1395,20 @@ function startLive(){
 function startTimers(){
   setInterval(()=>{sessSec++;const m=String(Math.floor(sessSec/60)).padStart(2,'0'),s=String(sessSec%60).padStart(2,'0');const el=document.getElementById('sess-t');if(el)el.textContent=m+':'+s;},1000);
   setInterval(()=>{if(!playing)return;vidSec++;const h=String(Math.floor(vidSec/3600)).padStart(2,'0'),m=String(Math.floor((vidSec%3600)/60)).padStart(2,'0'),s=String(vidSec%60).padStart(2,'0');const el=document.getElementById('tcDisp');if(el)el.textContent=`${h}:${m}:${s}`;},1000);
-  let ts=18*60+42,ls=5*60+20,us=8*60+15,rs=10*60,tot=32*60+17;
+  let tot=32*60+17;
   const fmt=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
-  setInterval(()=>{ts++;ls++;us++;rs++;tot++;const $=id=>document.getElementById(id);if($('t-time'))$('t-time').textContent=fmt(ts);if($('l-time'))$('l-time').textContent=fmt(ls);if($('u-time'))$('u-time').textContent=fmt(us);if($('r-time'))$('r-time').textContent=fmt(rs);if($('kpi-time'))$('kpi-time').textContent=fmt(tot);},1000);
+  setInterval(()=>{tot++;const $=id=>document.getElementById(id);if($('kpi-time'))$('kpi-time').textContent=fmt(tot);},1000);
 }
 </script>
+<script src="scripts/integracao-backend.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
