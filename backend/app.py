@@ -1,6 +1,7 @@
 ﻿import sys
 import os
 import time
+import uuid
 import random
 import tempfile
 from datetime import datetime
@@ -12,6 +13,7 @@ from backend.models import SessaoTerapia, AnaliseVisaoComputacional
 from iot.simulador_sensor import gerar_leitura_emg, gerar_leitura_forca, gerar_leitura_imu
 from backend.gerar_laudo import gerar_laudo_pdf
 from ia.prever import prever_risco
+from backend.historico import salvar_sessao, obter_historico
 
 app = Flask(__name__)
 CORS(app)
@@ -82,7 +84,7 @@ def laudo():
 def sessao_demo():
     try:
         sessao_obj = SessaoTerapia(
-            id=f"sessao-{int(time.time())}",
+            id=f"sessao-{uuid.uuid4()}",
             historico_id="hist-demo",
             data_hora=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             duracao_min=30,
@@ -95,11 +97,11 @@ def sessao_demo():
         nivel_dor = random.randint(0, 9)
 
         analise_antes = AnaliseVisaoComputacional(
-            id=f"analise-{int(time.time())}-antes", sessao=sessao_obj.id,
+            id=f"analise-{uuid.uuid4()}-antes", sessao=sessao_obj.id,
             angulo_articular=angulo_antes, articulacao="joelho", confianca=1.0, momento="antes"
         )
         analise_depois = AnaliseVisaoComputacional(
-            id=f"analise-{int(time.time())}-depois", sessao=sessao_obj.id,
+            id=f"analise-{uuid.uuid4()}-depois", sessao=sessao_obj.id,
             angulo_articular=angulo_depois, articulacao="joelho", confianca=1.0, momento="depois"
         )
 
@@ -133,6 +135,7 @@ def sessao_demo():
                 "margem_erro": predicao["margem_erro"], "fatores_contribuintes": predicao["fatores_contribuintes"]
             }
         }
+        salvar_sessao(resposta)
         return jsonify(resposta)
     except Exception as erro:
         return jsonify({"erro": f"Nao foi possivel gerar a sessao de demonstracao: {erro}"}), 500
@@ -155,7 +158,7 @@ def sessao():
         amplitude_movimento = round(angulo_antes - angulo_depois, 1)
 
         sessao_obj = SessaoTerapia(
-            id=f"sessao-{int(time.time())}",
+            id=f"sessao-{uuid.uuid4()}",
             historico_id="hist-real",
             data_hora=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             duracao_min=30,
@@ -163,11 +166,11 @@ def sessao():
         )
 
         analise_antes = AnaliseVisaoComputacional(
-            id=f"analise-{int(time.time())}-antes", sessao=sessao_obj.id,
+            id=f"analise-{uuid.uuid4()}-antes", sessao=sessao_obj.id,
             angulo_articular=angulo_antes, articulacao="joelho", confianca=1.0, momento="antes"
         )
         analise_depois = AnaliseVisaoComputacional(
-            id=f"analise-{int(time.time())}-depois", sessao=sessao_obj.id,
+            id=f"analise-{uuid.uuid4()}-depois", sessao=sessao_obj.id,
             angulo_articular=angulo_depois, articulacao="joelho", confianca=1.0, momento="depois"
         )
 
@@ -201,12 +204,20 @@ def sessao():
                 "margem_erro": predicao["margem_erro"], "fatores_contribuintes": predicao["fatores_contribuintes"]
             }
         }
+        salvar_sessao(resposta)
         return jsonify(resposta)
     except Exception as erro:
         return jsonify({"erro": f"Nao foi possivel registrar a sessao: {erro}"}), 500
 
 
 
+
+@app.route("/api/historico")
+def historico():
+    try:
+        return jsonify(obter_historico())
+    except Exception as erro:
+        return jsonify({"erro": f"Nao foi possivel obter o historico: {erro}"}), 500
 @app.route("/api/status")
 def status():
     resultado = {
@@ -242,4 +253,11 @@ def status():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+
+
+
+
+
 
