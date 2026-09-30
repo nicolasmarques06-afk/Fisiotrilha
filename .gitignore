@@ -6,3 +6,5 @@ __pycache__/
 videos/
 
 *.pdf
+
+backend/historico_sessoes.json

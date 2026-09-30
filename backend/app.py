@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 import os
 import time
 import uuid
@@ -119,7 +119,7 @@ def sessao_demo():
                         "margem_erro": 1.0, "fatores_contribuintes": str(erro_modelo)}
 
         resposta = {
-            "sessao": {"id": sessao_obj.id, "tipo_exercicio": sessao_obj.tipo_exercicio, "duracao_min": sessao_obj.duracao_min},
+            "sessao": {"id": sessao_obj.id, "tipo_exercicio": sessao_obj.tipo_exercicio, "duracao_min": sessao_obj.duracao_min, "data_hora": sessao_obj.data_hora},
             "analise_movimento": {
                 "angulo_antes": analise_antes.angulo_articular, "angulo_depois": analise_depois.angulo_articular,
                 "diferenca": round(analise_depois.angulo_articular - analise_antes.angulo_articular, 1),
@@ -188,7 +188,7 @@ def sessao():
                         "margem_erro": 1.0, "fatores_contribuintes": str(erro_modelo)}
 
         resposta = {
-            "sessao": {"id": sessao_obj.id, "tipo_exercicio": sessao_obj.tipo_exercicio, "duracao_min": sessao_obj.duracao_min},
+            "sessao": {"id": sessao_obj.id, "tipo_exercicio": sessao_obj.tipo_exercicio, "duracao_min": sessao_obj.duracao_min, "data_hora": sessao_obj.data_hora},
             "analise_movimento": {
                 "angulo_antes": analise_antes.angulo_articular, "angulo_depois": analise_depois.angulo_articular,
                 "diferenca": round(analise_depois.angulo_articular - analise_antes.angulo_articular, 1),
@@ -253,6 +253,7 @@ def status():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
