@@ -1,4 +1,4 @@
-"""
+﻿"""
 Fusao das previsoes das IAs V1 e V2 do Fisiotrilha.
 
 A V1 e a V2 continuam independentes.
@@ -96,13 +96,28 @@ def combinar_riscos(predicao_v1, predicao_v2):
 
     margem_erro_final = 1 - confianca_final
 
+    # Combina a explicabilidade das duas IAs, em vez de um texto generico.
+    # Usa .get() com fallback, entao funciona mesmo se uma das IAs nao
+    # trouxer esse campo.
+    fatores_v1 = str(predicao_v1.get("fatores_contribuintes", "")).strip()
+    fatores_v2 = str(predicao_v2.get("fatores_contribuintes", "")).strip()
+
+    partes_explicacao = []
+    if fatores_v1:
+        partes_explicacao.append(f"V1 (movimento e sensores): {fatores_v1}")
+    if fatores_v2:
+        partes_explicacao.append(f"V2 (dor detalhada): {fatores_v2}")
+
+    if partes_explicacao:
+        fatores_contribuintes_final = " | ".join(partes_explicacao)
+    else:
+        fatores_contribuintes_final = "Resultado combinado das IAs V1 e V2."
+
     return {
         "classificacao_risco": risco_final,
         "probabilidade": float(confianca_final),
         "margem_erro": float(margem_erro_final),
-        "fatores_contribuintes": (
-            "Resultado combinado das IAs V1 e V2."
-        ),
+        "fatores_contribuintes": fatores_contribuintes_final,
         "detalhes_fusao": {
             "risco_v1": predicao_v1["classificacao_risco"],
             "probabilidade_v1": probabilidade_v1,
