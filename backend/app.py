@@ -1,4 +1,4 @@
-import sys
+﻿import sys
 import os
 import time
 import uuid
@@ -183,7 +183,7 @@ def sessao():
 
         angulo_antes = dados.get("angulo_antes", round(random.uniform(150, 175), 1))
         angulo_depois = dados.get("angulo_depois", round(random.uniform(80, 100), 1))
-        amplitude_movimento = round(angulo_antes - angulo_depois, 1)
+        amplitude_movimento = dados.get("amplitude_movimento", round(abs(angulo_antes - angulo_depois), 1))
 
         sessao_obj = SessaoTerapia(
             id=f"sessao-{uuid.uuid4()}",
