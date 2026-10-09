@@ -321,6 +321,11 @@ def status():
 
     return jsonify(resultado)
 
+from frontend_estatico import registrar as _registrar_frontend
+_registrar_frontend(app)
+from visao_servico import registrar as _registrar_visao
+_registrar_visao(app)
+
 if __name__ == "__main__":
     app.run(debug=True)
 
