@@ -76,7 +76,16 @@ def equipamento_imu():
 def laudo():
     try:
         caminho_temp = os.path.join(tempfile.gettempdir(), "laudo_fisiotrilha.pdf")
-        gerar_laudo_pdf(caminho_temp, paciente_nome="Maria Ferreira", paciente_nascimento="14/03/1985")
+        _hist = obter_historico()
+        _sid = request.args.get("sessao")
+        _idx = len(_hist) - 1
+        if _sid:
+            for _i, _s in enumerate(_hist):
+                if (_s.get("sessao") or {}).get("id") == _sid:
+                    _idx = _i
+        _atual = _hist[_idx] if _hist else None
+        _ant = _hist[_idx - 1] if _hist and _idx > 0 else None
+        gerar_laudo_pdf(caminho_temp, paciente_nome="Maria Ferreira", paciente_nascimento="14/03/1985", sessao=_atual, anterior=_ant)
         return send_file(caminho_temp, mimetype="application/pdf", as_attachment=False, download_name="laudo_fisiotrilha.pdf")
     except Exception as erro:
         return jsonify({"erro": f"Nao foi possivel gerar o laudo: {erro}"}), 500
@@ -328,6 +337,7 @@ _registrar_visao(app)
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
