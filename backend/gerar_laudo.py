@@ -23,10 +23,11 @@ FUNDO_RISCO = {"alto": "#FADBD8", "medio": "#FDEBD0", "baixo": "#E2EFDA", "nd": 
 NOME_RISCO = {"alto": "Alto", "medio": "Médio", "baixo": "Baixo", "nd": "Não classificado"}
 ORDEM_RISCO = {"baixo": 1, "medio": 2, "alto": 3}
 
-# Faixas ILUSTRATIVAS (sensores simulados). AJUSTAR conforme a pesquisa de dominio do grupo.
-FAIXA_EMG = (30, 70)      # % de ativacao: abaixo = baixa, acima = alta
-FAIXA_IMU = (10, 20)      # graus/s de oscilacao: abaixo = baixa, acima = alta
-TOLERANCIA_FORCA = 10     # pontos percentuais de diferenca em relacao a 50%
+# Convenções (ver pesquisa de faixas): assimetria de apoio 10% / 15% = limiares de triagem, NÃO validados
+# (Parkinson et al., 2021; Hawkin Dynamics). EMG: convenção do protótipo. IMU: sem faixa normativa.
+LIMIAR_ASSIM_ATENCAO = 10
+LIMIAR_ASSIM_ALERTA = 15
+FAIXA_EMG = (30, 70)      # % de ativacao: abaixo = baixa, acima = alta (convencao do prototipo)
 
 
 # ---------------------------------------------------------------- utilidades
@@ -144,23 +145,36 @@ def interp_dor(d):
 def interp_emg(v):
     if v is None:
         return "—"
-    return "Ativação baixa" if v < FAIXA_EMG[0] else ("Ativação alta" if v > FAIXA_EMG[1] else "Ativação moderada")
+    nivel = "baixa" if v < FAIXA_EMG[0] else ("alta" if v > FAIXA_EMG[1] else "moderada")
+    return f"Ativação {nivel} (convenção do protótipo)"
+
+
+def assimetria_pct(v):
+    """Assimetria de apoio em %: |D - E| / (D + E) x 100, com D + E = 100."""
+    return abs(2 * (v - 50))
 
 
 def interp_forca(v):
     if v is None:
         return "—"
-    dif = v - 50
-    if abs(dif) <= TOLERANCIA_FORCA:
-        return "Distribuição de carga equilibrada entre as pernas"
-    return "Sobrecarga na perna direita" if dif > 0 else "Menor apoio na perna direita (carga maior na esquerda)"
+    a = assimetria_pct(v)
+    lado = "direita" if v > 50 else "esquerda"
+    if a <= LIMIAR_ASSIM_ATENCAO:
+        return f"Apoio equilibrado (assimetria de {br(a)}%)"
+    if a <= LIMIAR_ASSIM_ALERTA:
+        return f"Atenção: assimetria de {br(a)}%, maior carga na perna {lado}"
+    return f"Alerta: assimetria de {br(a)}%, maior carga na perna {lado}"
 
 
-def interp_imu(v):
+def interp_imu(v, anterior=None):
     if v is None:
         return "—"
-    return "Oscilação baixa (movimento estável)" if v < FAIXA_IMU[0] else \
-        ("Oscilação alta (movimento instável)" if v > FAIXA_IMU[1] else "Oscilação moderada")
+    if anterior is None or anterior == 0:
+        return "Sem faixa normativa estabelecida; comparar com as próximas sessões"
+    var = (v - anterior) / anterior * 100
+    if abs(var) < 10:
+        return "Semelhante à sessão anterior"
+    return f"Oscilação {br(abs(var), 0)}% " + ("maior" if var > 0 else "menor") + " que na sessão anterior"
 
 
 def separar_fatores(texto):
@@ -280,9 +294,10 @@ def gerar_laudo_pdf(caminho_saida, paciente_nome="(nome do paciente)", paciente_
         [P("Sensor", celh), P("Leitura", celh), P("Interpretação orientativa", celh)],
         [P("EMG (ativação muscular)"), P(leitura(d["emg"])), P(interp_emg(d["emg"][0]))],
         [P("Plataforma de força"), P(leitura(d["forca"])), P(interp_forca(d["forca"][0]))],
-        [P("IMU (estabilidade)"), P(leitura(d["imu"])), P(interp_imu(d["imu"][0]))],
+        [P("IMU (estabilidade)"), P(leitura(d["imu"])), P(interp_imu(d["imu"][0], ant["imu"][0] if ant else None))],
     ], [5 * cm, 4.5 * cm, 7.5 * cm]))
-    story.append(Paragraph("Valores gerados por simuladores; as faixas usadas na interpretação são ilustrativas.", nota))
+    story.append(Paragraph(("Valores simulados. Força: limiares de triagem de 10% e 15% de assimetria (convenção da literatura, não validada). "
+                           "EMG: faixas são convenção do protótipo. IMU: sem faixa normativa; compara-se com a sessão anterior."), nota))
 
     # 6. IA
     story.append(Paragraph("6. Apoio à decisão (Inteligência Artificial V1 + V2)", secao))
@@ -345,9 +360,16 @@ def gerar_laudo_pdf(caminho_saida, paciente_nome="(nome do paciente)", paciente_
     story.append(Spacer(1, 10))
     story.append(Paragraph("Fisioterapeuta responsável: ______________________________  CREFITO n.º ____________", rodape_est))
 
+    story.append(Spacer(1, 8))
+    story.append(Paragraph(
+        "Referências das faixas: Parkinson et al. (2021), revisão sistemática sobre cálculo e limiares de assimetria de força; "
+        "Hawkin Dynamics, limiares padrão de assimetria (10% e 15%); Hannan &amp; King (2022), IJSPT 17(6):1075-1082; "
+        "Hammond et al. (2016), J Fitness Res 5(3):57-67; Escamilla (2001), Med Sci Sports Exerc 33(1):127-141.", nota))
+
     doc.build(story, onFirstPage=pagina, onLaterPages=pagina)
     return caminho_saida
 
 
 if __name__ == "__main__":
     print("Laudo gerado em:", gerar_laudo_pdf("laudo_demo.pdf", paciente_nome="Maria Ferreira", paciente_nascimento="14/03/1985"))
+

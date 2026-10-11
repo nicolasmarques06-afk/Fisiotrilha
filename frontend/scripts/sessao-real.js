@@ -96,9 +96,9 @@
         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:.9rem">' +
           '<div class="card"><div class="card-hd"><div class="card-title"><span class="ctd b"></span>Sensores simulados (IoT)</div><span class="chip ch-b">EMG · Força · IMU</span></div>' +
             '<div class="card-bd"><div style="display:flex;gap:1.5rem;flex-wrap:wrap">' +
-              '<div><div style="font-size:.56rem;color:var(--t3);text-transform:uppercase">EMG</div><div id="ss-emg" style="font-family:var(--mono);font-size:1.5rem;color:var(--t1)">—</div></div>' +
-              '<div><div style="font-size:.56rem;color:var(--t3);text-transform:uppercase">Força (perna dir.)</div><div id="ss-forca" style="font-family:var(--mono);font-size:1.5rem;color:var(--t1)">—</div></div>' +
-              '<div><div style="font-size:.56rem;color:var(--t3);text-transform:uppercase">IMU</div><div id="ss-imu" style="font-family:var(--mono);font-size:1.5rem;color:var(--t1)">—</div></div>' +
+              '<div><div style="font-size:.56rem;color:var(--t3);text-transform:uppercase">EMG</div><div id="ss-emg" style="font-family:var(--mono);font-size:1.5rem;color:var(--t1)">—</div><div id="ss-emg-i" style="font-size:.62rem;color:var(--t3);margin-top:2px;max-width:180px"></div></div>' +
+              '<div><div style="font-size:.56rem;color:var(--t3);text-transform:uppercase">Força (perna dir.)</div><div id="ss-forca" style="font-family:var(--mono);font-size:1.5rem;color:var(--t1)">—</div><div id="ss-forca-i" style="font-size:.62rem;color:var(--t3);margin-top:2px;max-width:180px"></div></div>' +
+              '<div><div style="font-size:.56rem;color:var(--t3);text-transform:uppercase">IMU</div><div id="ss-imu" style="font-family:var(--mono);font-size:1.5rem;color:var(--t1)">—</div><div id="ss-imu-i" style="font-size:.62rem;color:var(--t3);margin-top:2px;max-width:180px"></div></div>' +
             '</div></div></div>' +
           '<div class="card"><div class="card-hd"><div class="card-title"><span class="ctd a"></span>Predição de risco — IA V1 + V2</div><span id="ss-chip" class="chip ch-a">—</span></div>' +
             '<div class="card-bd"><div style="display:flex;align-items:baseline;gap:.8rem;margin-bottom:.5rem">' +
@@ -109,6 +109,24 @@
             '</div></div>' +
         '</div>' +
       '</div>';
+  }
+  var LIM_ATENCAO = 10, LIM_ALERTA = 15, FAIXA_EMG = [30, 70];
+  function interpEmg(v) {
+    if (v === null) return '';
+    return 'Ativação ' + (v < FAIXA_EMG[0] ? 'baixa' : (v > FAIXA_EMG[1] ? 'alta' : 'moderada'));
+  }
+  function interpForca(v) {
+    if (v === null) return '';
+    var a = Math.abs(2 * (v - 50)), lado = v > 50 ? 'direita' : 'esquerda';
+    if (a <= LIM_ATENCAO) return 'Apoio equilibrado (assimetria ' + fmt(a) + '%)';
+    return (a <= LIM_ALERTA ? 'Atenção' : 'Alerta') + ': assimetria ' + fmt(a) + '%, mais carga na perna ' + lado;
+  }
+  function interpImu(v, ant) {
+    if (v === null) return '';
+    if (ant === null || ant === undefined || ant === 0) return 'Sem faixa normativa; compara com a sessão anterior';
+    var d = (v - ant) / ant * 100;
+    if (Math.abs(d) < 10) return 'Semelhante à sessão anterior';
+    return 'Oscilação ' + fmt(Math.abs(d), 0) + '% ' + (d > 0 ? 'maior' : 'menor') + ' que na anterior';
   }
   function set(id, txt) { var e = document.getElementById(id); if (e) e.textContent = txt; }
 
@@ -124,6 +142,14 @@
     set('ss-amp', fmt(n.amp) + '°');
     set('ss-d1', fmt(n.repouso, 0)); set('ss-d2', fmt(n.atividade, 0)); set('ss-d3', fmt(n.pos, 0));
     set('ss-emg', fmt(n.emg)); set('ss-forca', fmt(n.forca)); set('ss-imu', fmt(n.imu));
+    var ant = sessoes.length > 1 ? sessoes[sessoes.length - 2] : null;
+    set('ss-emg-i', interpEmg(n.emg)); set('ss-forca-i', interpForca(n.forca));
+    set('ss-imu-i', interpImu(n.imu, ant ? ant.imu : null));
+    var fi = document.getElementById('ss-forca-i');
+    if (fi && n.forca !== null) {
+      var aa = Math.abs(2 * (n.forca - 50));
+      fi.style.color = aa > LIM_ALERTA ? '#FF3B5C' : (aa > LIM_ATENCAO ? '#F5A623' : 'var(--t3)');
+    }
     var cor = corRisco(n.risco);
     var r = document.getElementById('ss-risco'); if (r) { r.textContent = n.risco; r.style.color = cor; }
     set('ss-prob', n.prob !== null ? (fmt(n.prob) + '% de confiança' + (n.margem !== null ? ' (±' + fmt(n.margem) + ')' : '')) : '');
@@ -210,4 +236,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar);
   else iniciar();
 })();
+
 
