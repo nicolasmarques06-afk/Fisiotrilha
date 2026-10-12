@@ -145,11 +145,81 @@ fisiotrilha-dev/
 
 ## Como rodar
 
-- **Python** (versao 3.9 ou mais recente) — [baixar aqui](https://www.python.org/downloads/)
+### O que você precisa ter instalado antes de começar
+
+- **Python** (versão 3.9 ou mais recente) — [baixar aqui](https://www.python.org/downloads/)
 - **Git** — [baixar aqui](https://git-scm.com/download/win)
+- Webcam (para o momento "depois" ao vivo) e navegador moderno (Chrome ou Edge)
 
-Depois de instalar os dois, feche e abra o PowerShell de novo antes de continuar (isso e necessario para o Windows reconhecer os novos programas).
+Depois de instalar o Python e o Git, feche e abra o PowerShell de novo antes de continuar (isso é necessário para o Windows reconhecer os novos programas).
 
+### Passo 1 — Baixar o projeto
+
+```powershell
+git clone https://github.com/nicolasmarques06-afk/Fisiotrilha.git
+cd Fisiotrilha
+```
+
+### Passo 2 — Instalar as bibliotecas necessárias
+
+Este comando lê o arquivo `requirements.txt` e instala tudo que o projeto precisa, de uma vez:
+
+```powershell
+pip install -r requirements.txt
+```
+
+Isso pode demorar alguns minutos (a biblioteca de visão computacional é grande). Se algum pacote falhar por causa de instabilidade de internet, rode o comando de novo.
+
+### Passo 3 — Baixar o modelo de visão computacional
+
+Esse arquivo é usado para detectar o corpo nos vídeos/webcam, e não fica salvo no Git (é um arquivo grande e sempre igual para todo mundo, então cada pessoa baixa a própria cópia):
+
+```powershell
+Invoke-WebRequest -Uri "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task" -OutFile "visao_computacional\pose_landmarker_lite.task"
+```
+
+### Passo 4 — Rodar o backend (o sistema por trás das telas)
+
+```powershell
+python backend\app.py
+```
+
+Deve aparecer `Running on http://127.0.0.1:5000`. **Deixe essa janela aberta** enquanto for usar o sistema — feche só quando terminar.
+
+> Mantenha **apenas uma instância** do Flask aberta. Duas instâncias disputam a webcam.
+
+### Passo 5 — Abrir a interface
+
+Com o backend rodando, abra no navegador:
+
+**http://127.0.0.1:5000**
+
+Ao abrir, o sistema verifica o servidor, a IA, o gerador de laudo, os sensores e o histórico. Depois mostra a tela de login.
+
+### Login de teste
+
+- **Usuário:** dr.silva@hospital.org
+- **Senha:** 12345678
+
+### Alternativa pelo terminal
+
+Também é possível rodar a sessão antes/depois sem o navegador:
+
+```powershell
+python visao_computacional\sessao_antes_depois.py --antes video --depois webcam --duracao 15 --preparo 5
+```
+
+O script mede os ângulos, pergunta as três notas de dor e envia a sessão para `/api/sessao`.
+
+### Problemas comuns
+
+**"git não é reconhecido como comando"** — o Git não foi instalado corretamente, ou o PowerShell não foi reaberto depois da instalação. Feche e abra o PowerShell de novo.
+
+**"ModuleNotFoundError" ao rodar algum script** — alguma biblioteca do `requirements.txt` não instalou. Rode `pip install -r requirements.txt` de novo, ou instale a biblioteca específica mencionada no erro (ex: `pip install openpyxl`).
+
+**O site abre mas os dados não atualizam / login não funciona** — confira se o backend (Passo 4) está rodando numa janela separada, sem ter sido fechado.
+
+**Dúvidas?** Chama o Nicolas.
 
 ## Roteiro de demonstração
 
