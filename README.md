@@ -42,9 +42,9 @@ O sistema roda **100% local e sem custo**: não depende de internet nem de servi
 
 Grupo **Sharp Consulting Group** · Ciência da Computação · Centro Universitário Fundação Santo André.
 
-- Nicolas Marques Cruz da Silva
-- Matheus Campos
 - Marcella Poncetti
+- Matheus Campos
+- Nicolas Marques
 - Ricardo do Prado
 
 O projeto foi construído em conjunto pelo grupo, com todos os integrantes participando de todas as etapas, do início ao fim.
