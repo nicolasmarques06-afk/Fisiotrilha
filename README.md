@@ -49,7 +49,7 @@ Grupo **Sharp Consulting Group** · Ciência da Computação · Centro Universit
 
 O projeto foi construído em conjunto pelo grupo, com todos os integrantes participando de todas as etapas, do início ao fim.
 
-Apresentação do projeto: **05-06/11/2026**.
+Apresentação do projeto: **05/11/2026 e/ou 06/11/2026**.
 
 ## O que o sistema faz
 
